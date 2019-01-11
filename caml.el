@@ -283,7 +283,7 @@ you are one.")
 
 Many people find electric keys irritating, so you can disable them if
 you are one. You should probably have this on, though, if you also
-have caml-electric-indent on, which see.")
+have `caml-electric-indent' on, which see.")
 
 ;;code
 (if (or (not (fboundp 'indent-line-to))
@@ -418,7 +418,7 @@ have caml-electric-indent on, which see.")
         [ "Open module for documentation" ocaml-open t ]
         [ "Close module for documentation" ocaml-close t ]
         ))
-  "Menu to add to the menubar when running Xemacs")
+  "Menu to add to the menubar when running Xemacs.")
 
 (defvar caml-mode-syntax-table nil
   "Syntax table in use in Caml mode buffers.")
@@ -457,7 +457,7 @@ have caml-electric-indent on, which see.")
 ;; Other internal variables
 
 (defvar caml-imenu-shown nil
-  "True if we have computed definition list.")
+  "Non-nil if we have computed definition list.")
 (make-variable-buffer-local 'caml-imenu-shown)
 
 (defconst caml-imenu-search-regexp
@@ -475,7 +475,7 @@ have caml-electric-indent on, which see.")
 
 ;;
 (defvar caml-mode-hook nil
-  "Hook for caml-mode")
+  "Hook for `caml-mode'.")
 
 (defun caml-mode ()
   "Major mode for editing OCaml code.
@@ -571,6 +571,7 @@ have caml-electric-indent on, which see.")
 ;;; Auxiliary function. Garrigue 96-11-01.
 
 (defun caml-find-alternate-file ()
+  "Find the `.mli' file for the open `.ml' file, or vice versa."
   (interactive)
   (let ((name (buffer-file-name)))
     (if (string-match "^\\(.*\\)\\.\\(ml\\|mli\\)$" name)
@@ -582,7 +583,9 @@ have caml-electric-indent on, which see.")
 ;;; subshell support
 
 (defun caml-eval-region (start end)
-  "Send the current region to the inferior OCaml process."
+  "Evaluate the region.
+Send the current region bounded by START and END to the inferior
+OCaml process."
   (interactive"r")
   (require 'inf-caml)
   (inferior-caml-eval-region start end))
@@ -598,17 +601,17 @@ have caml-electric-indent on, which see.")
 
 (defun caml-eval-phrase (arg &optional min max)
   "Send the phrase containing the point to the CAML process.
-With prefix-arg send as many phrases as its numeric value,
+With a prefix argument send as many phrases as its numeric value,
 If an error occurs during evaluation, stop at this phrase and
 report the error.
 
 Return nil if noerror and position of error if any.
 
-If arg's numeric value is zero or negative, evaluate the current phrase
+If ARG's numeric value is zero or negative, evaluate the current phrase
 or as many as prefix arg, ignoring evaluation errors.
 This allows to jump other erroneous phrases.
 
-Optional arguments min max defines a region within which the phrase
+Optional arguments MIN MAX defines a region within which the phrase
 should lies."
   (interactive "p")
   (require 'inf-caml)
@@ -616,8 +619,8 @@ should lies."
 
 (defun caml-eval-buffer (arg)
   "Evaluate the buffer from the beginning to the phrase under the point.
-With prefix arg, evaluate past the whole buffer, no stopping at
-the current point."
+With a prefix ARG, evaluate past the whole buffer, no
+stopping at the current point."
   (interactive "p")
   (let ((here (point)) err)
     (goto-char (point-min))
@@ -627,6 +630,7 @@ the current point."
     (goto-char here)))
 
 (defun caml-show-subshell ()
+  "Start an inferior subshell."
   (interactive)
   (require 'inf-caml)
   (inferior-caml-show-subshell))
@@ -634,6 +638,7 @@ the current point."
 
 ;;; Imenu support
 (defun caml-show-imenu ()
+  "Open `imenu'."
   (interactive)
   (require 'imenu)
   (switch-to-buffer (current-buffer))
@@ -650,6 +655,7 @@ the current point."
                     (if (looking-at "in") (caml-find-in-match)))))
     (set-match-data data)
     found))
+
 (defun caml-create-index-function ()
   (let (value-alist
         type-alist
@@ -707,8 +713,9 @@ the current point."
 ;;; Indentation stuff
 
 (defun caml-in-indentation ()
-  "Tests whether all characters between beginning of line and point
-are blanks."
+  "Test if inside indentation.
+This function tests whether all characters between beginning of
+line and point are blanks."
   (save-excursion
     (skip-chars-backward " \t")
     (bolp)))
@@ -718,9 +725,8 @@ are blanks."
 
 (defun caml-indent-command (&optional p)
   "Indent the current line in Caml mode.
-
-Compute new indentation based on caml syntax. If prefixed, indent
-the line all the way to where point is."
+Compute new indentation based on Caml syntax. If prefixed P,
+indent the line all the way to where point is."
 
   (interactive "*p")
   (cond
@@ -737,7 +743,7 @@ the line all the way to where point is."
 Works only if the point is at the beginning of an indented line
 \(i.e. all characters between beginning of line and point are
 blanks\).  Does nothing otherwise. The unindent size is given by the
-variable caml-mode-indentation."
+variable `caml-mode-indentation'."
 
   (interactive "*")
   (let* ((begline
@@ -825,8 +831,9 @@ variable caml-mode-indentation."
 
 (defconst caml-error-chars-regexp
   ".*, .*, [A-\377]+ \\([0-9]+\\)-\\([0-9]+\\):?"
-  "Regular expression extracting the character numbers
-from an error message produced by camlc.")
+  "Regular expression used by `next-error'.
+This regular expression extracts the character numbers from an
+error message produced by camlc.")
 
 ;; Wrapper around next-error.
 
@@ -845,7 +852,7 @@ from an error message produced by camlc.")
 ;that way we get our effect even when we do \C-x` in compilation buffer
 
 (defadvice next-error (after caml-next-error activate)
- "Reads the extra positional information provided by the OCaml compiler.
+  "Read the extra positional information provided by the OCaml compiler.
 
 Puts the point and the mark exactly around the erroneous program
 fragment. The erroneous fragment is also temporarily highlighted if
@@ -906,13 +913,13 @@ possible."
 ;; on some emacs.
 
 (defun caml-match-string (num &optional string)
-
   "Return string of text matched by last search, without properties.
 
 NUM specifies which parenthesized expression in the last regexp.
-Value is nil if NUMth pair didn't match, or there were less than NUM
-pairs.  Zero means the entire text matched by the whole regexp or
-whole string."
+Value is nil if NUMth pair didn't match, or there were less than
+NUM pairs. Zero means the entire text matched by the whole regexp
+or whole string. Uses STRING is given and otherwise extracts from
+buffer."
 
   (let* ((data (match-data))
          (begin (nth (* 2 num) data))
@@ -937,15 +944,18 @@ whole string."
 (defconst caml-phrase-start-keywords
   (concat "\\_<\\(class\\|ex\\(ternal\\|ception\\)\\|functor"
           "\\|let\\|module\\|open\\|type\\|val\\)\\_>")
-  "Keywords starting phrases in files")
+  "Keywords starting phrases in files.")
 
-;; a phrase starts when a toplevel keyword is at the beginning of a line
 (defun caml-at-phrase-start-p ()
+  "Check if at the start of a phrase.
+A phrase starts when a toplevel keyword is at the beginning of a
+line."
   (and (bolp)
        (or (looking-at "#")
            (looking-at caml-phrase-start-keywords))))
 
 (defun caml-skip-comments-forward ()
+  "Skip forward past comments."
   (skip-chars-forward " \n\t")
   (while (or (looking-at comment-start-skip) (caml-in-comment-p))
     (if (= (following-char) ?\)) (forward-char)
@@ -953,6 +963,7 @@ whole string."
     (skip-chars-forward " \n\t")))
 
 (defun caml-skip-comments-backward ()
+  "Skip backward past comments."
   (skip-chars-backward " \n\t")
   (while (and (eq (preceding-char) ?\)) (eq (char-after (- (point) 2)) ?*))
     (backward-char)
@@ -963,9 +974,9 @@ whole string."
 
 (defun caml-find-phrase (&optional min-pos max-pos)
   "Find the CAML phrase containing the point.
-Return the position of the beginning of the phrase, and move point
-to the end.
-"
+Return the position of the beginning of the phrase, and move
+point to the end. Optionally operates between MIN-POS and
+MAX-POS."
   (interactive)
   (if (not min-pos) (setq min-pos (point-min)))
   (if (not max-pos) (setq max-pos (point-max)))
@@ -998,14 +1009,14 @@ to the end.
       (if (not kwop) (goto-char min-pos))
       (caml-skip-comments-forward)
       (setq beg (point))
-      (if (>= beg end) (error "no phrase before point"))
+      (if (>= beg end) (error "No phrase before point"))
       (goto-char end)))
     (caml-skip-comments-forward)
     beg))
 
 (defun caml-mark-phrase (&optional min-pos max-pos)
   "Put mark at end of this OCaml phrase, point at beginning.
-"
+Optionally operates between MIN-POS and MAX-POS."
   (interactive)
   (let* ((beg (caml-find-phrase min-pos max-pos)) (end (point)))
     (push-mark)
@@ -1035,7 +1046,7 @@ to the end.
   (<= (max b1 b2) (min e1 e2)))
 
 (defun caml-in-literal-p ()
-  "Returns non-nil if point is inside a caml literal."
+  "Return non-nil if point is inside a caml literal."
   (let* ((start-literal (concat "[\"" caml-quote-char "]"))
          (char-literal
           (concat "\\([^\\]\\|\\\\\\.\\|\\\\[0-9][0-9][0-9]\\)"
@@ -1095,7 +1106,7 @@ to the end.
     (= count 0)))
 
 (defun caml-in-comment-p ()
-  "Returns non-nil if point is inside a caml comment.
+  "Return non-nil if point is inside a caml comment.
 Returns nil for the parenthesis opening a comment."
   (nth 4 (syntax-ppss)))
 
@@ -1140,11 +1151,13 @@ Used to distinguish it from toplevel let construct.")
   "Array of regexps representing caml keywords of different priorities.")
 
 (defun caml-in-shebang-line ()
+  "Check if in shebang."
   (save-excursion
     (beginning-of-line)
     (and (= 1 (point)) (looking-at "#!"))))
 
 (defun caml-in-expr-p ()
+  "Check if in expression."
   (let ((pos (point)) (in-expr t))
     (caml-find-kwop
      (concat caml-before-expr-prefix "\\|"
@@ -1168,6 +1181,7 @@ Used to distinguish it from toplevel let construct.")
     in-expr))
 
 (defun caml-at-sexp-close-p ()
+  "Check if at end of sexp."
   (or (char-equal ?\) (following-char))
       (char-equal ?\] (following-char))
       (char-equal ?\} (following-char))))
@@ -1438,7 +1452,7 @@ the line where the governing keyword occurs.")
   (caml-find-kwop-skipping-blocks 3))
 
 (defun caml-find-kwop-skipping-blocks (prio)
-  "Look back for a caml keyword matching caml-kwop-regexps [PRIO].
+  "Look back for a caml keyword matching `caml-kwop-regexps' [PRIO].
 
  Skip nested blocks."
 
@@ -1721,8 +1735,9 @@ by |, insert one."
 ;; with other dialects as long as ;; marks the end of phrase.
 
 (defun caml-indent-phrase (arg)
-  "Indent current phrase
-with prefix arg, indent that many phrases starting with the current phrase."
+  "Indent the current phrase.
+With prefix ARG, indent that many phrases starting with the
+current phrase."
   (interactive "p")
   (save-excursion
     (let ((beg (caml-find-phrase)))
@@ -1730,6 +1745,7 @@ with prefix arg, indent that many phrases starting with the current phrase."
     (indent-region beg (point) nil))))
 
 (defun caml-indent-buffer ()
+  "Indent the whole buffer."
   (interactive)
   (indent-region (point-min) (point-max) nil))
 
@@ -1766,7 +1782,7 @@ with prefix arg, indent that many phrases starting with the current phrase."
   (back-to-indentation))
 
 (defun caml-insert-begin-form ()
-  "Inserts a nicely formatted begin-end form, leaving a mark after end."
+  "Insert a nicely formatted begin-end form, leaving a mark after end."
   (interactive "*")
   (let ((prec (preceding-char)))
     (if (and (numberp prec) (not (char-equal ?\  (char-syntax prec))))
@@ -1779,7 +1795,7 @@ with prefix arg, indent that many phrases starting with the current phrase."
     (indent-line-to i)))
 
 (defun caml-insert-for-form ()
-  "Inserts a nicely formatted for-do-done form, leaving a mark after do(ne)."
+  "Insert a nicely formatted for-do-done form, leaving a mark after do(ne)."
   (interactive "*")
   (let ((prec (preceding-char)))
     (if (and (numberp prec) (not (char-equal ?\  (char-syntax prec))))
