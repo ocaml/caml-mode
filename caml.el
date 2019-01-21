@@ -793,7 +793,7 @@ variable `caml-mode-indentation'."
 
 (defconst caml-error-regexp
   "^[ A-\377]+ \"\\([^\"\n]+\\)\", [A-\377]+ \\([0-9]+\\)[-,:]"
-  "Regular expression matching the error messages produced by camlc.")
+  "Regular expression matching the error messages produced by ocamlc.")
 
 ;; Newer emacs versions support line/char ranges
 ;; We will adapt OCaml to output error messages in a compatible format.
@@ -833,7 +833,7 @@ variable `caml-mode-indentation'."
   ".*, .*, [A-\377]+ \\([0-9]+\\)-\\([0-9]+\\):?"
   "Regular expression used by `next-error'.
 This regular expression extracts the character numbers from an
-error message produced by camlc.")
+error message produced by ocamlc.")
 
 ;; Wrapper around next-error.
 
