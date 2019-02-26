@@ -184,7 +184,7 @@
 ; match any sequence of non-special characters in a comment
 ; note: this is only to go faster than one character at a time
 (defconst caml-font-other-comment-re
-  "[^{(*\"'\012\015]+"
+  "[^A-Za-z_\300-\326\330-\366\370-\377{(*\"'\012\015]+"
 )
 
 ; match any sequence of non-special characters in a string
@@ -299,6 +299,8 @@
          ((looking-at caml-font-newline-re)
           (goto-char (match-end 0))
           (setq continue (caml-font-put-state (match-end 0) (cons nil depth))))
+         ((caml-font-looking-at caml-font-ident-re)
+          (goto-char (match-end 0)))
          ((caml-font-looking-at caml-font-other-comment-re)
           (goto-char (match-end 0)))
          (t
