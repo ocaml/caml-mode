@@ -1,3 +1,5 @@
+[![MELPA](https://melpa.org/packages/caml-badge.svg)](https://melpa.org/#/caml)
+
 OCaml Emacs mode
 ================
 
@@ -16,8 +18,24 @@ package.
 Installation
 ------------
 
-To use it, just put the .el files in your Emacs load path, and add the
-following lines in your [Init File][].
+### MELPA
+
+The easiest way of installing this package is through [MELPA][].  If
+you haven't already done so, [configure
+it](https://melpa.org/#/getting-started) and run [<kbd>M-x
+package-list-packages</kbd>](https://www.gnu.org/software/emacs/manual/html_node/emacs/Packages.html#Packages).
+
+### OPAM
+
+Alternatively, you can use [OPAM][] and install `caml-mode` and
+`user-setup`:
+
+    opam install caml-mode user-setup
+
+### Manual instllation
+
+To use this package, just put the `.el` files in your Emacs load path,
+and add the following lines in your [Init File][].
 
     (add-to-list 'auto-mode-alist '("\\.ml[iylp]?$" . caml-mode))
     (autoload 'caml-mode "caml" "Major mode for editing OCaml code." t)
@@ -51,7 +69,8 @@ collectively, but it might be a good idea to copy `caml-hilit.el` or
 `caml-font.el` to you own directory, and edit it to your taste and
 colors.
 
-Main key bindings:
+Main key bindings
+-----------------
 
 <kbd>TAB</kbd>     indent current line  
 <kbd>M-C-q</kbd>   indent phrase  
@@ -101,5 +120,6 @@ function.
 
 
 [OCaml]: http://ocaml.org/
+[OPAM]: https://opam.ocaml.org/
 [MELPA]: https://melpa.org/
 [Init File]: https://www.gnu.org/software/emacs/manual/html_node/emacs/Init-File.html
