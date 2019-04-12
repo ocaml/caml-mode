@@ -1,0 +1,28 @@
+opam-version: "2.0"
+name: "caml-mode"
+version: "4.06"
+authors: [
+  "Damien Doligez"
+  "Jacques Garrigue"
+  "Xavier Leroy"
+  "Didier Remy"
+  "Ian T Zimmerman"
+]
+maintainer: "Christophe.Troestler@umons.ac.be"
+license: "GNU General Public License"
+homepage: "https://github.com/ocaml/ocaml"
+dev-repo: "git+https://github.com/ocaml/ocaml.git"
+bug-reports: "http://caml.inria.fr/mantis/"
+install: [
+  [make "install" "EMACSDIR=%{share}%/emacs/site-lisp"]
+  [make "install-ocamltags" "BINDIR=%{bin}%"]
+]
+remove: [
+  [make "uninstall" "EMACSDIR=%{share}%/emacs/site-lisp"]
+  [make "uninstall-ocamltags" "BINDIR=%{bin}%"]
+]
+depends: ["ocaml" "conf-emacs"]
+post-messages: """
+If you have not yet done so, please add in ~/.emacs.d/init.el or
+in ~/.emacs to following line:
+    (add-to-list 'load-path "%{share}%/emacs/site-lisp/")""" {success}
