@@ -2,7 +2,7 @@ OCaml Emacs mode
 ================
 
 The files in this archive define a `caml-mode` for Emacs, for editing
-OCaml programs, as well as an inferior-caml-mode, to run a toplevel.
+[OCaml][] programs, as well as an inferior-caml-mode, to run a toplevel.
 
 Caml-mode supports indentation, compilation and error retrieving,
 sending phrases to the toplevel. Moreover support for hilit,
@@ -10,10 +10,14 @@ font-lock and imenu was added.
 
 This package is based on the original `caml-mode` for caml-light by
 Xavier Leroy, extended with indentation by Ian Zimmerman. For details
-see README.itz, which is the README from Ian Zimmerman's package.
+see [README.itz](README.itz), which is the README from Ian Zimmerman's
+package.
 
-To use it, just put the .el files in your emacs load path, and add the
-following lines in your .emacs.
+Installation
+------------
+
+To use it, just put the .el files in your Emacs load path, and add the
+following lines in your [Init File][].
 
     (add-to-list 'auto-mode-alist '("\\.ml[iylp]?$" . caml-mode))
     (autoload 'caml-mode "caml" "Major mode for editing OCaml code." t)
@@ -35,9 +39,9 @@ To install ocamltags, do
 
     % make install-ocamltags
 
-To use highlighting capabilities, add ONE of the following two lines
-to your .emacs.  The second one works better on recent versions of
-emacs.
+To use highlighting capabilities, add **one** of the following two lines
+to your [Init File][].  The second one works better on recent versions of
+Emacs.
 
     (if window-system (require 'caml-hilit))
     (if window-system (require 'caml-font))
@@ -65,7 +69,7 @@ Once you have started caml by M-x run-caml:
 
 For other bindings, see <kbd>C-h b</kbd>.
 
-Some remarks about the style supported:
+Some remarks about the style supported
 --------------------------------------
 
 Since OCaml's syntax is very liberal (more than 100
@@ -94,3 +98,8 @@ stops, to speed up the code. A phrase starts when any of the keywords
 `external`, appears at the beginning of a line. Using the first column
 for such keywords in other cases may confuse the phrase selection
 function.
+
+
+[OCaml]: http://ocaml.org/
+[MELPA]: https://melpa.org/
+[Init File]: https://www.gnu.org/software/emacs/manual/html_node/emacs/Init-File.html
