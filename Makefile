@@ -12,15 +12,20 @@
 #*                                                                        *
 #**************************************************************************
 
-ROOTDIR = ..
-
-include $(ROOTDIR)/Makefile.config
-include $(ROOTDIR)/Makefile.common
+VERSION = $(shell grep "^version" caml-mode.opam \
+	| sed -e 's/version: *"\([^"]*\)"/\1/')
+DESCRIPTION = $(shell grep ';;; caml.el ---' caml.el \
+	| sed 's/[^-]*--- *\(.*\)/\1/')
+DIST_DIR = caml-mode-$(VERSION)
+OPAM_DIR = caml-mode.$(VERSION)
+TARBALL = caml-mode-$(VERSION).tgz
 
 # Files to install
 FILES=	caml-font.el caml-hilit.el caml.el camldebug.el \
 	inf-caml.el caml-compat.el caml-help.el caml-types.el \
 	caml-xemacs.el caml-emacs.el
+
+DIST_FILES = $(FILES) Makefile README* COPYING* CHANGES.md ocamltags.in
 
 # Where to install. If empty, automatically determined.
 #EMACSDIR=
@@ -79,9 +84,29 @@ ocamltags:	ocamltags.in
 install-ocamltags: ocamltags
 	$(INSTALL_DATA) ocamltags $(SCRIPTDIR)/ocamltags
 
+# OPAM
+.PHONY: opam
+opam: $(TARBALL)
+	mkdir -p $(OPAM_DIR)
+	cp -a caml-mode.opam $(OPAM_DIR)/opam
+	echo "url {" >> $(OPAM_DIR)/opam
+	echo "  src: \"`pwd`/https://github.com/ocaml/caml-mode/releases/download/$(VERSION)/$(TARBALL)\"" >> $(OPAM_DIR)/opam
+	echo "  checksum: \"md5=`md5sum $(TARBALL) | cut -d ' ' -f 1`\"" \
+	  >> $(OPAM_DIR)/opam
+	echo "}" >> $(OPAM_DIR)/opam
+
+$(TARBALL): $(DIST_FILES)
+	mkdir -p $(DIST_DIR)
+	for f in $(DIST_FILES); do cp $$f $(DIST_DIR); done
+	echo "(define-package \"caml\" \"$(VERSION)\" \"$(DESCRIPTION)\" \
+		)" > $(DIST_DIR)/caml-pkg.el
+	tar acvf $@ $(DIST_DIR)
+	$(RM) -rf $(DIST_DIR)
+
 # This is for testing purposes
 compile-only:
 	$(EMACS) --batch --eval '$(COMPILECMD)'
 
 clean:
 	rm -f ocamltags *~ \#*# *.elc
+	$(RM) -r $(TARBALL) $(OPAM_DIR)
