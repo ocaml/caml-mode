@@ -21,9 +21,9 @@ OPAM_DIR = caml-mode.$(VERSION)
 TARBALL = caml-mode-$(VERSION).tgz
 
 # Files to install
-FILES=	caml-font.el caml-hilit.el caml.el camldebug.el \
-	inf-caml.el caml-compat.el caml-help.el caml-types.el \
-	caml-xemacs.el caml-emacs.el caml-mode-site-file.el
+FILES=	caml-font.el caml.el camldebug.el      \
+	inf-caml.el caml-help.el caml-types.el \
+	caml-xemacs.el caml-emacs.el
 
 DIST_FILES = $(FILES) Makefile README* COPYING* CHANGES.md ocamltags.in
 
@@ -47,14 +47,6 @@ COMPILECMD=(progn \
 	      (byte-compile-file "caml-types.el") \
 	      (byte-compile-file "caml-font.el") \
 	      (byte-compile-file "camldebug.el"))
-
-caml-mode-site-file.el: $(SOURCES)
-	(echo ";;; $@ --- Automatically extracted autoloads.";\
-	 echo ";;; Code:";\
-	 echo "(add-to-list 'load-path";\
-	 echo "             (or (file-name-directory load-file-name) (car load-path)))";\
-	 echo "") >$@
-	$(EMACS) --batch --eval '(setq generated-autoload-file "'`pwd`'/$@")' -f batch-update-autoloads "."
 
 install:
 	@if test "$(EMACSDIR)" = ""; then \

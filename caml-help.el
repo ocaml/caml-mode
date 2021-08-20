@@ -1,4 +1,4 @@
-;;; caml-help.el --- Contextual completion and help to caml-mode
+;;; caml-help.el --- Contextual completion and help to caml-mode  -*- lexical-binding: t; -*-
 ;**************************************************************************
 ;*                                                                        *
 ;*                                 OCaml                                  *
@@ -52,6 +52,11 @@
 ;;
 
 ;; variables to be customized
+
+(defgroup caml-help nil
+  "Customizations for `caml-help'.")
+
+(require 'cl-lib)
 
 (defvar ocaml-lib-path 'lazy
   "Path list for ocaml lib sources (mli files).
@@ -132,15 +137,15 @@
       (setq files (cdr files)))
     modules))
 
-(defun ocaml-add-path (dir &optional path)
+(defun ocaml-add-path (dir &optional _path)
   "Extend  `ocaml-module-alist' with modules of DIR relative to PATH."
   (interactive "D")
   (let* ((old (ocaml-lib-path))
          (new
           (if (file-name-absolute-p dir) dir
             (concat
-             (or (find-if (lambda (p) (file-directory-p (concat p  "/" dir)))
-                      (cons default-directory old))
+             (or (cl-find-if (lambda (p) (file-directory-p (concat p  "/" dir)))
+                             (cons default-directory old))
                  (error "Directory not found"))
              "/" dir))))
     (setq ocaml-lib-path (cons (car old) (cons new (cdr old))))
@@ -157,11 +162,11 @@
     )
   ocaml-module-alist)
 
-(defun ocaml-get-or-make-module (module &optional tag)
+(defun ocaml-get-or-make-module (module &optional _tag)
   (let ((info (assoc module (ocaml-module-alist))))
     (if info nil
       (setq info (cons module (cons (cons 'local default-directory) 'lazy)))
-      (setq ocaml-module-alist (cons info ocaml-module-alist))
+      (push info ocaml-module-alist)
       )
     info))
 
@@ -247,7 +252,7 @@ When call interactively, make completion over known modules."
         (setq ocaml-visible-modules
               (cons (ocaml-get-or-make-module arg) (ocaml-visible-modules)))
         ))
-  (message "%S" (mapcar 'car (ocaml-visible-modules))))
+  (message "%S" (mapcar #'car (ocaml-visible-modules))))
 
 (defun ocaml-close-module (arg)
   "*Close module of name ARG when ARG is a string.
@@ -265,10 +270,10 @@ Otherwise if ARG is true, close all modules and reset to default."
                modules))
         (if (equal arg "") (setq arg (caar modules))))
       (setq ocaml-visible-modules
-            (remove-if (lambda (m) (equal (car m) arg))
-                       ocaml-visible-modules))
+            (cl-remove-if (lambda (m) (equal (car m) arg))
+                          ocaml-visible-modules))
       ))
-  (message "%S" (mapcar 'car (ocaml-visible-modules))))
+  (message "%S" (mapcar #'car (ocaml-visible-modules))))
 
 
 ;; Look for identifiers around point
@@ -318,9 +323,9 @@ with an optional non-nil argument."
                 (or (assoc module (ocaml-module-alist))
                     (error "Unknown module %s" module))))
           (ocaml-visible-modules))))
-    (message "Completion from %s" (mapconcat 'car list " "))
+    (message "Completion from %s" (mapconcat #'car list " "))
     (if (null pattern)
-        (apply 'append (mapcar 'ocaml-module-symbols list))
+        (apply #'append (mapcar #'ocaml-module-symbols list))
       (let ((pat (concat "^" (regexp-quote pattern))) (res))
         (mapc
          (lambda (l)
@@ -332,7 +337,7 @@ with an optional non-nil argument."
         res)
       )))
 
-(defun caml-complete (arg)
+(defun caml-complete (&optional _arg)
   "Does completion for OCaml identifiers qualified.
 
 It attemps to recognize a qualified identifier Module . entry
@@ -343,9 +348,9 @@ If Module is defined, it does completion for identifier in Module.
 If Module is undefined, it does completion in visible modules.
 Then, if completion fails, it does completion among  all modules
 where identifier is defined."
-  (interactive "p")
-  (let* ((module-entry (ocaml-qualified-identifier)) (entry)
-         (module)
+  (interactive "")
+  (let* ((module-entry (ocaml-qualified-identifier))
+         (module) ;; (entry)
          (beg) (end) (pattern))
     (if (car module-entry)
         (progn
@@ -361,7 +366,8 @@ where identifier is defined."
                      (insert module) t)
                    (setq module-entry (ocaml-qualified-identifier))
                    (car module-entry)
-                   (progn (setq entry (cdr module-entry)) t))
+                   (progn ;; (setq entry (cdr module-entry))
+                          t))
               (error "Unknown module %s" module))))
     (if (consp (cdr module-entry))
         (progn
@@ -380,13 +386,13 @@ where identifier is defined."
       (setq pattern (buffer-substring beg end))
       (let* ((all-completions (ocaml-completion pattern module))
              (completion
-              (try-completion pattern (mapcar 'list all-completions))))
+              (try-completion pattern all-completions)))
         (cond ((eq completion t))
 
               ((null completion)
                (let*
                    ((modules (ocaml-find-module pattern))
-                    (visible (intersection modules (ocaml-visible-modules)))
+                    (visible (cl-intersection modules (ocaml-visible-modules)))
                     (hist)
                     (module
                      (cond
@@ -397,7 +403,7 @@ where identifier is defined."
                       ((equal (length visible) 1)
                        (caar visible))
                       (t
-                       (setq hist (mapcar 'car modules))
+                       (setq hist (mapcar #'car modules))
                        (completing-read "Module: " modules nil t
                                         "" (cons hist 0)))
                       )))
@@ -444,7 +450,7 @@ Additional suffix .gz may be added if info files are compressed.")
     (if (or (null files)
             (not (stringp files))
             (string-match files "^ *$"))
-        (message "No info file found: %s." (mapconcat 'identity files " "))
+        (message "No info file found: %s." (mapconcat #'identity files " "))
       (message "Scanning info files %s." files)
       (save-window-excursion
         (set-buffer (get-buffer-create "*caml-help*"))
@@ -679,7 +685,7 @@ from the position of point in the current buffer."
            (not (string-equal module "")))
           (error "Quit"))
       (let ((symbols
-             (mapcar 'list
+             (mapcar #'list
                      (ocaml-module-symbols
                       (assoc module (ocaml-module-alist))))))
         (setq entry
@@ -702,7 +708,7 @@ from the position of point in the current buffer."
                    ((equal (length modules) 1)
                     (caar modules))
                    (t
-                    (setq hist (mapcar 'car modules))
+                    (setq hist (mapcar #'car modules))
                     (setq default (car hist))
                     (setq module
                           (completing-read
@@ -800,7 +806,7 @@ buffer positions."
     (if links
         (let ((regexp (concat "[^A-Za-z0-9'_]\\("
                               ocaml-longident-regexp "\\|"
-                              (mapconcat 'car links "\\|")
+                              (mapconcat #'car links "\\|")
                               "\\)[^A-Za-z0-9'_]"))
               (case-fold-search nil))
           (save-excursion

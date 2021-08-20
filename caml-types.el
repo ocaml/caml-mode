@@ -1,4 +1,4 @@
-;**************************************************************************
+;**************************************************************************  -*- lexical-binding: t; -*-
 ;*                                                                        *
 ;*                                 OCaml                                  *
 ;*                                                                        *
@@ -17,9 +17,11 @@
 ;; XEmacs compatibility
 
 (eval-and-compile
-  (if (and (boundp 'running-xemacs) running-xemacs)
+  (if (featurep 'xemacs)
       (require 'caml-xemacs)
     (require 'caml-emacs)))
+
+(defvar caml-types-buffer)              ;Forward declaration.
 
 (defun caml-types-feedback (info format)
   "Displays INFO using the given FORMAT."
@@ -85,6 +87,9 @@ type call ident")
   (setq caml-types-location-re
         (concat "^" caml-types-position-re " " caml-types-position-re)))
 
+(defgroup caml-types nil
+  "Customization for `caml-types'.")
+
 (defface caml-types-expr-face
   '((((class color) (background light)) :background "#88FF44")
     (((class color) (background  dark)) :background "dark green"))
@@ -131,6 +136,8 @@ type call ident")
   "Name of buffer for displaying caml types.")
 (defvar caml-types-buffer nil
   "Buffer for displaying caml types.")
+
+(defvar target-file) ;; FIXME: Get rid of this dynbound variable!
 
 (defun caml-types-show-type (arg)
   "Show the type of expression or pattern at point.
@@ -394,7 +401,7 @@ corresponding .annot file."
   (symbol-name (intern elem table)))
 
 
-(defun next-annotation ()
+(defun caml-types--next-annotation ()
   (forward-char 1)
   (if (re-search-forward "^[a-z\"]" () t)
       (forward-char -1)
@@ -408,8 +415,9 @@ corresponding .annot file."
 ;   (kind . info) where kind = "type" "call" etc.
 ;                 and info = the contents of the annotation
 
-(defun caml-types-build-tree (target-file)
-  (let ((stack ())
+(defun caml-types-build-tree (t-file)
+  (let ((target-file t-file)
+        (stack ())
         (accu ())
         (table (caml-types-make-hash-table))
         (annotation ()))
@@ -424,7 +432,7 @@ corresponding .annot file."
             (r-cnum (caml-string-to-int (match-string 10))))
         (unless (caml-types-not-in-file l-file r-file target-file)
           (setq annotation ())
-          (while (next-annotation)
+          (while (caml-types--next-annotation)
             (cond ((looking-at "^\\([a-z]+\\)(\n  \\(\\(.*\n  \\)*.*\\)\n)")
                    (let ((kind (caml-types-hcons (match-string 1) table))
                          (info (caml-types-hcons (match-string 2) table)))
@@ -447,11 +455,11 @@ corresponding .annot file."
             (car stack)
           (caml-types-make-node left-pos right-pos () (nreverse stack)))))))
 
-(defun caml-types-not-in-file (l-file r-file target-file)
-  (or (and (not (string= l-file target-file))
-           (not (string= l-file "")))
-      (and (not (string= r-file target-file))
-           (not (string= r-file "")))))
+(defun caml-types-not-in-file (l-file r-file t-file)
+  (not (and (or (string= l-file t-file)
+                (string= l-file ""))
+            (or (string= r-file t-file)
+                (string= r-file "")))))
 
 (defun caml-types-make-node (left-pos right-pos annotation children)
   (let ((result (make-vector (+ 3 (length children)) ()))
@@ -564,11 +572,13 @@ corresponding .annot file."
                     (> (- cnum1 bol1) (- cnum2 bol2))))))))
 
 (defun caml-types-get-pos (buf pos)
-  (save-excursion
-    (set-buffer buf)
-    (goto-line (elt pos 1))
-    (forward-char (- (elt pos 3) (elt pos 2)))
-    (point)))
+  (with-current-buffer buf
+    (save-restriction
+      (widen)
+      (goto-char (point-min))
+      (forward-line (1- (elt pos 1)))
+      (forward-char (- (elt pos 3) (elt pos 2)))
+      (point))))
 
 ; find-file-read-only-noselect seems to be missing from emacs...
 (defun caml-types-find-file (name)
@@ -586,7 +596,7 @@ corresponding .annot file."
     (error (format "Can't read the annotation file `%s'" name))))
   buf))
 
-(defun caml-types-mouse-ignore (event)
+(defun caml-types-mouse-ignore (_event)
   (interactive "e")
   nil)
 
@@ -612,7 +622,7 @@ The function uses two overlays.
          (target-file (file-name-nondirectory (buffer-file-name)))
          (target-line) (target-bol)
          target-pos
-         Left Right limits cnum node mes type
+         limits cnum node mes type
          region
          (window (caml-event-window event))
          target-tree
