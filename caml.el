@@ -473,7 +473,7 @@ have `caml-electric-indent' on, which see.")
 (defvar caml-mode-hook nil
   "Hook for `caml-mode'.")
 
-(define-derived-mode caml-mode fundamental-mode "caml" ;FIXME: Use `prog-mode'
+(define-derived-mode caml-mode prog-mode "caml"
   "Major mode for editing OCaml code."
   (setq local-abbrev-table caml-mode-abbrev-table)
   (make-local-variable 'paragraph-start)
