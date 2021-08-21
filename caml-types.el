@@ -88,7 +88,8 @@ type call ident")
         (concat "^" caml-types-position-re " " caml-types-position-re)))
 
 (defgroup caml-types nil
-  "Customization for `caml-types'.")
+  "Customization for `caml-types'."
+  :group 'languages)
 
 (defface caml-types-expr-face
   '((((class color) (background light)) :background "#88FF44")

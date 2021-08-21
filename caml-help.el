@@ -54,7 +54,8 @@
 ;; variables to be customized
 
 (defgroup caml-help nil
-  "Customizations for `caml-help'.")
+  "Customizations for `caml-help'."
+  :group 'languages)
 
 (require 'cl-lib)
 
