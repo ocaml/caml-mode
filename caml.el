@@ -6,8 +6,8 @@
 ;;         Ian T Zimmerman <itz@rahul.net>
 ;; Maintainer: Damien Doligez <damien.doligez@inria.fr>
 ;; Created: July 1993
-;; Package-Requires: ((emacs "22") (cl-lib "0.5"))
-;; Version: 4.7.1
+;; Package-Requires: ((emacs "24.3") (cl-lib "0.5"))
+;; Version: 4.8
 ;; Keywords: OCaml
 ;; Homepage: https://github.com/ocaml/ocaml/
 

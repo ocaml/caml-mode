@@ -76,7 +76,7 @@
   (if (not (face-differs-from-default-p 'camldebug-event))
       (invert-face 'camldebug-event))
   (if (not (face-differs-from-default-p 'camldebug-underline))
-      (set-face-underline-p 'camldebug-underline t))
+      (set-face-underline 'camldebug-underline t))
   (setq camldebug-overlay-event (make-overlay 1 1))
   (overlay-put camldebug-overlay-event 'face 'camldebug-event)
   (setq camldebug-overlay-under (make-overlay 1 1))
