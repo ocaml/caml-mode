@@ -811,9 +811,6 @@ error message produced by ocamlc.")
 (defvar caml-error-overlay nil)
 (defvar caml-next-error-skip-warnings-flag nil)
 
-(define-obsolete-function-alias 'caml-string-to-int
-  #'string-to-number "Jan 2021")
-
 ;;itz 04-21-96 somebody didn't get the documentation for next-error
 ;;right. When the optional argument is a number n, it should move
 ;;forward n errors, not reparse.
