@@ -31,7 +31,24 @@ DIST_FILES = $(FILES) Makefile README* COPYING* CHANGES.md ocamltags.in
 #EMACSDIR=
 
 # Name of Emacs executable
-EMACS=emacs
+EMACSFORMACOSX = /Applications/Emacs.app/Contents/MacOS/Emacs
+EMACSMACPORTS = /Applications/MacPorts/Emacs.app/Contents/MacOS/Emacs
+AQUAMACS = $(shell test -d /Applications \
+	&& find /Applications -type f | grep 'Aquamacs$$')
+ifeq ($(wildcard $(EMACSFORMACOSX)),$(EMACSFORMACOSX))
+EMACS ?= $(EMACSFORMACOSX)
+else
+ifeq ($(wildcard $(EMACSMACPORTS)),$(EMACSMACPORTS))
+EMACS ?= $(EMACSMACPORTS)
+else
+ifneq ($(strip $(AQUAMACS)),)
+ifeq ($(wildcard $(AQUAMACS)),$(AQUAMACS))
+EMACS ?= $(AQUAMACS)
+endif
+endif
+endif
+endif
+EMACS ?= emacs
 
 # Where to install ocamltags script
 SCRIPTDIR = $(BINDIR)
