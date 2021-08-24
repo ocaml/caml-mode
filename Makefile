@@ -25,7 +25,6 @@ FILES=	caml-font.el caml.el camldebug.el      \
 	inf-caml.el caml-help.el caml-types.el \
 	caml-xemacs.el caml-emacs.el
 
-INSTALL_FILES =
 INSTALL_DIR ?= $(shell opam var share)/emacs/site-lisp
 INSTALL_BIN ?= $(shell opam var bin)
 
@@ -52,7 +51,7 @@ endif
 EMACS ?= emacs
 
 INSTALL_MKDIR = mkdir -p
-INSTALL_DATA = $(CP)
+INSTALL_DATA = cp
 INSTALL_RM_R = $(RM) -r
 
 # Command for byte-compiling the files
@@ -77,12 +76,14 @@ install-el:
 
 install:
 	@echo "Installing in $(INSTALL_DIR)..."
-	if test -d $(INSTALL_DIR); then : ; \
-	  else $(INSTALL_MKDIR) $(INSTALL_DIR); fi
+	$(INSTALL_MKDIR) $(INSTALL_DIR)
 	$(INSTALL_DATA) $(FILES) $(INSTALL_DIR)
 	if [ -z "$(NOCOMPILE)" ]; then \
 	  cd $(INSTALL_DIR); $(EMACS) --batch --eval '$(COMPILECMD)'; \
 	fi
+
+uninstall:
+	cd $(INSTALL_DIR) && $(INSTALL_RM_R) $(FILES) $(FILES:.el=.elc)
 
 ocamltags:	ocamltags.in
 	sed -e 's:@EMACS@:$(EMACS):' ocamltags.in >ocamltags
@@ -90,6 +91,9 @@ ocamltags:	ocamltags.in
 
 install-ocamltags: ocamltags
 	$(INSTALL_DATA) ocamltags $(INSTALL_BIN)/ocamltags
+
+uninstall-ocamltags:
+	$(INSTALL_RM_R) $(INSTALL_BIN)/ocamltags
 
 tarball: $(TARBALL)
 $(TARBALL): $(DIST_FILES)
@@ -118,5 +122,6 @@ clean:
 	$(RM) -r $(TARBALL)
 
 
-.PHONY: install install-el ocamltags install-ocamltags \
+.PHONY: install uninstall install-el \
+	ocamltags install-ocamltags uninstall-ocamltags \
         tarball submit compile-only clean

@@ -3,4 +3,5 @@
 /caml-autoloads.el
 *.tgz
 caml-mode.*/
+ocamltags
 packages
