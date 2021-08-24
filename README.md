@@ -19,13 +19,12 @@ package.
 Installation
 ------------
 
-### MELPA
+### NonGNU ELPA and MELPA
 
 The easiest way of installing this package is through [NonGNU ELPA][]
-or [MELPA][].  If
-you haven't already done so, [configure
-it](https://melpa.org/#/getting-started) and run [<kbd>M-x
-package-list-packages</kbd>](https://www.gnu.org/software/emacs/manual/html_node/emacs/Packages.html#Packages).
+or [MELPA][] ([set it up](https://melpa.org/#/getting-started)).
+Just run
+[<kbd>M-x package-list-packages</kbd>](https://www.gnu.org/software/emacs/manual/html_node/emacs/Packages.html#Packages).
 
 ### OPAM
 
