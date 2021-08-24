@@ -796,8 +796,17 @@ variable `caml-mode-indentation'."
   "Regular expression matching the error messages produced by ocamlc/ocamlopt.
 Also matches source references in exception backtraces.")
 
+(defun caml--end-column ()
+  "Return the end-column number in a parsed OCaml message.
+OCaml uses exclusive end-columns but Emacs wants them to be inclusive."
+  (and (match-beginning 7)
+       (+ (string-to-number (match-string 7))
+          ;; Prior to Emacs 28, the end-column function value was incorrectly
+          ;; off by one.
+          (if (>= emacs-major-version 28) -1 0))))
+
 (when (boundp 'compilation-error-regexp-alist-alist)
-  (push `(ocaml ,caml--error-regexp 3 (4 . 5) (6 . tuareg--end-column) (8) 1
+  (push `(ocaml ,caml--error-regexp 3 (4 . 5) (6 . caml--end-column) (8) 1
                 (8 font-lock-function-name-face))
         compilation-error-regexp-alist-alist))
 
