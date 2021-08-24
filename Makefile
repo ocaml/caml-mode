@@ -14,8 +14,8 @@
 
 VERSION = $(shell grep "^;; *Version" caml.el \
 	| sed -e 's/;; *Version: *\([^ \t]*\)/\1/')
-DESCRIPTION = $(shell grep ';;; caml.el ---' caml.el \
-	| sed 's/[^-]*--- *\(.*\)/\1/')
+SYNOPSIS = $(shell grep ';;; caml.el ---' caml.el \
+	| sed 's/[^-]*--- *\([^-]\+\) \+.*/\1/')
 DIST_NAME = caml-mode-$(VERSION)
 TARBALL = caml-mode-$(VERSION).tgz
 OPAM_FILE = packages/caml-mode/caml-mode.$(VERSION)/opam
@@ -99,7 +99,7 @@ tarball: $(TARBALL)
 $(TARBALL): $(DIST_FILES)
 	$(INSTALL_MKDIR) $(DIST_NAME)
 	for f in $(DIST_FILES); do cp $$f $(DIST_NAME); done
-	echo "(define-package \"caml\" \"$(VERSION)\" \"$(DESCRIPTION)\" \
+	echo "(define-package \"caml\" \"$(VERSION)\" \"$(SYNOPSIS)\" \
 		)" > $(DIST_NAME)/caml-pkg.el
 	tar acvf $@ $(DIST_NAME)
 	$(INSTALL_RM_R) $(DIST_NAME)
@@ -110,7 +110,8 @@ submit: $(TARBALL)
 	  exit 1; \
 	fi
 	$(INSTALL_MKDIR) $(dir $(OPAM_FILE))
-	sed -e "s/VERSION/$(VERSION)/" caml-mode.opam > $(OPAM_FILE)
+	sed -e "s/VERSION/$(VERSION)/" -e 's/SYNOPSIS/$(SYNOPSIS)/' \
+	  caml-mode.opam > $(OPAM_FILE)
 	echo "url {" >> $(OPAM_FILE)
 	echo "  src: \"https://github.com/ocaml/caml-mode/releases/download/$(VERSION)/$(TARBALL)\"" >> $(OPAM_FILE)
 	echo "  checksum: \"md5=`md5sum $(TARBALL) | cut -d ' ' -f 1`\"" \

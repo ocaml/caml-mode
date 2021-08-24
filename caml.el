@@ -1,4 +1,4 @@
-;;; caml.el --- OCaml code editing commands for Emacs  -*- lexical-binding: t; -*-
+;;; caml.el --- Caml mode for GNU Emacs and XEmacs -*- lexical-binding: t; -*-
 
 ;; Copyright (C) 1997-2017 Institut National de Recherche en Informatique et en Automatique.
 
