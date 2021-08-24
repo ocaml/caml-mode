@@ -82,6 +82,9 @@ install:
 	else \
 	  $(MAKE) simple-install; \
 	fi
+# This is for testing purposes
+compile-only:
+	$(EMACS) --batch --eval '$(COMPILECMD)'
 
 # install the .el files, but do not compile them.
 install-el:
@@ -110,9 +113,6 @@ $(TARBALL): $(DIST_FILES)
 	tar acvf $@ $(DIST_NAME)
 	$(INSTALL_RM_R) $(DIST_NAME)
 
-# This is for testing purposes
-compile-only:
-	$(EMACS) --batch --eval '$(COMPILECMD)'
 submit: $(TARBALL)
 	@if [ ! -d packages/ ]; then \
 	  echo "Make a symbolic link packages → OPAM repository/packages"; \
@@ -131,3 +131,5 @@ clean:
 	$(RM) -r $(TARBALL)
 
 
+.PHONY: install install-el ocamltags install-ocamltags \
+        submit compile-only clean
