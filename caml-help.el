@@ -49,6 +49,7 @@
     (require 'caml-emacs)))
 
 (require 'info)
+(require 'view)
 
 ;; Loading or building databases.
 ;;
@@ -605,7 +606,7 @@ current buffer using \\[ocaml-qualified-identifier]."
           (let ((file (concat location (ocaml-uncapitalize module) ".mli")))
             (if (window-live-p same-window)
                 (progn (select-window same-window)
-                       (view-mode-exit view-return-to-alist view-exit-action))
+                       (view-mode-exit nil view-exit-action))
               ;; (view-buffer (find-file-noselect file) 'view))
               )
             (view-file-other-window file)
