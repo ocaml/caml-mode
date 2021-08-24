@@ -26,3 +26,4 @@ post-messages: """
 If you have not yet done so, please add in ~/.emacs.d/init.el or
 in ~/.emacs to following line:
     (add-to-list 'load-path "%{share}%/emacs/site-lisp/")""" {success}
+synopsis: "SYNOPSIS"
