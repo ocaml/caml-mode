@@ -4,12 +4,13 @@
 
 ;; Author: Jacques Garrigue <garrigue@kurims.kyoto-u.ac.jp>
 ;;         Ian T Zimmerman <itz@rahul.net>
-;; Maintainer: Damien Doligez <damien.doligez@inria.fr>
+;;         Damien Doligez <damien.doligez@inria.fr>
+;; Maintainer: Christophe Troestler <Christophe.Troestler@umons.ac.be>
 ;; Created: July 1993
 ;; Package-Requires: ((emacs "24.3") (cl-lib "0.5"))
 ;; Version: 4.8
 ;; Keywords: OCaml
-;; Homepage: https://github.com/ocaml/ocaml/
+;; Homepage: https://github.com/ocaml/caml-mode
 
 ;; This file is not part of GNU Emacs.
 
