@@ -16,8 +16,7 @@ VERSION = $(shell grep "^;; *Version" caml.el \
 	| sed -e 's/;; *Version: *\([^ \t]*\)/\1/')
 DESCRIPTION = $(shell grep ';;; caml.el ---' caml.el \
 	| sed 's/[^-]*--- *\(.*\)/\1/')
-DIST_DIR = caml-mode-$(VERSION)
-OPAM_DIR = caml-mode.$(VERSION)
+DIST_NAME = caml-mode-$(VERSION)
 TARBALL = caml-mode-$(VERSION).tgz
 OPAM_FILE = packages/caml-mode/caml-mode.$(VERSION)/opam
 
@@ -104,12 +103,12 @@ install-ocamltags: ocamltags
 	$(INSTALL_DATA) ocamltags $(SCRIPTDIR)/ocamltags
 
 $(TARBALL): $(DIST_FILES)
-	mkdir -p $(DIST_DIR)
-	for f in $(DIST_FILES); do cp $$f $(DIST_DIR); done
+	$(INSTALL_MKDIR) $(DIST_NAME)
+	for f in $(DIST_FILES); do cp $$f $(DIST_NAME); done
 	echo "(define-package \"caml\" \"$(VERSION)\" \"$(DESCRIPTION)\" \
-		)" > $(DIST_DIR)/caml-pkg.el
-	tar acvf $@ $(DIST_DIR)
-	$(RM) -rf $(DIST_DIR)
+		)" > $(DIST_NAME)/caml-pkg.el
+	tar acvf $@ $(DIST_NAME)
+	$(INSTALL_RM_R) $(DIST_NAME)
 
 # This is for testing purposes
 compile-only:
