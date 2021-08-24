@@ -758,46 +758,51 @@ variable `caml-mode-indentation'."
 
 (require 'compile)
 
-;; In Emacs 19, the regexps in compilation-error-regexp-alist do not
-;; match the error messages when the language is not English.
-;; Hence we add a regexp.
-;; FIXME do we (still) have i18n of error messages ???
+(defconst caml--error-regexp
+  (rx bol
+      (* " ")
+      (group                                ; 1: HIGHLIGHT
+       (or "File "
+           ;; Exception backtrace.
+           (seq
+            (or "Raised at" "Re-raised at" "Raised by primitive operation at"
+                "Called from")
+            (* nonl)            ; OCaml ≥4.11: " FUNCTION in"
+            " file "))
+       (group (? "\""))                     ; 2
+       (group (+ (not (in "\t\n \",<>"))))  ; 3: FILE
+       (backref 2)
+       (? " (inlined)")
+       ", line" (? "s") " "
+       (group (+ (in "0-9")))               ; 4: LINE-START
+       (? "-" (group (+ (in "0-9"))))       ; 5; LINE-END
+       (? ", character" (? "s") " "
+          (group (+ (in "0-9")))            ; 6: COL-START
+          (? "-" (group (+ (in "0-9")))))   ; 7: COL-END
+       ;; Colon not present in backtraces.
+       (? ":"))
+      (? "\n"
+         (* (in "\t "))
+         (* (or (seq (+ (in "0-9"))
+                     " | "
+                     (* nonl))
+                (+ "^"))
+            "\n"
+            (* (in "\t ")))
+         (group "Warning"                   ; 8: WARNING
+                (? " " (+ (in "0-9")))
+                (? " [" (+ (in "a-z0-9-")) "]")
+                ":")))
+  "Regular expression matching the error messages produced by ocamlc/ocamlopt.
+Also matches source references in exception backtraces.")
 
-(defconst caml-error-regexp
-  "^[ A-\377]+ \"\\([^\"\n]+\\)\", [A-\377]+ \\([0-9]+\\)[-,:]"
-  "Regular expression matching the error messages produced by ocamlc.")
+(when (boundp 'compilation-error-regexp-alist-alist)
+  (push `(ocaml ,caml--error-regexp 3 (4 . 5) (6 . tuareg--end-column) (8) 1
+                (8 font-lock-function-name-face))
+        compilation-error-regexp-alist-alist))
 
-;; Newer emacs versions support line/char ranges
-;; We will adapt OCaml to output error messages in a compatible format.
-;; In the meantime we add new formats here in addition to the old one.
-(defconst caml-error-regexp-newstyle
-  (concat "^[ A-\377]+ \"\\([^\"\n]+\\)\", line \\([0-9]+\\),"
-          "char \\([0-9]+\\) to line \\([0-9]+\\), char \\([0-9]+\\):")
-  "Regular expression matching the error messages produced by ocamlc/ocamlopt.")
-
-(defconst caml-error-regexp-new-newstyle
-  (concat "^[ A-\377]+ \"\\([^\"\n]+\\)\", line \\([0-9]+\\), "
-          "characters \\([0-9]+\\)-\\([0-9]+\\):")
-  "Regular expression matching the error messages produced by ocamlc/ocamlopt.")
-
-
-(if (boundp 'compilation-error-regexp-alist)
-    (progn
-      (or (assoc caml-error-regexp
-                 compilation-error-regexp-alist)
-          (setq compilation-error-regexp-alist
-                (cons (list caml-error-regexp 1 2)
-                      compilation-error-regexp-alist)))
-      (or (assoc caml-error-regexp-newstyle
-                 compilation-error-regexp-alist)
-          (setq compilation-error-regexp-alist
-                (cons (list caml-error-regexp-newstyle 1 '(2 . 4) '(3 . 5))
-                      compilation-error-regexp-alist)))
-      (or (assoc caml-error-regexp-new-newstyle
-                 compilation-error-regexp-alist)
-          (setq compilation-error-regexp-alist
-                (cons (list caml-error-regexp-new-newstyle 1 2 '(3 . 4))
-                      compilation-error-regexp-alist)))))
+(when (boundp 'compilation-error-regexp-alist)
+  (push 'ocaml compilation-error-regexp-alist))
 
 ;; A regexp to extract the range info
 
