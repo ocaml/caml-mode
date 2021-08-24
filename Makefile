@@ -91,6 +91,7 @@ ocamltags:	ocamltags.in
 install-ocamltags: ocamltags
 	$(INSTALL_DATA) ocamltags $(INSTALL_BIN)/ocamltags
 
+tarball: $(TARBALL)
 $(TARBALL): $(DIST_FILES)
 	$(INSTALL_MKDIR) $(DIST_NAME)
 	for f in $(DIST_FILES); do cp $$f $(DIST_NAME); done
@@ -118,4 +119,4 @@ clean:
 
 
 .PHONY: install install-el ocamltags install-ocamltags \
-        submit compile-only clean
+        tarball submit compile-only clean
