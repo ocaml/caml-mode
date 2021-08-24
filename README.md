@@ -21,7 +21,8 @@ Installation
 
 ### MELPA
 
-The easiest way of installing this package is through [MELPA][].  If
+The easiest way of installing this package is through [NonGNU ELPA][]
+or [MELPA][].  If
 you haven't already done so, [configure
 it](https://melpa.org/#/getting-started) and run [<kbd>M-x
 package-list-packages</kbd>](https://www.gnu.org/software/emacs/manual/html_node/emacs/Packages.html#Packages).
@@ -122,5 +123,6 @@ function.
 
 [OCaml]: http://ocaml.org/
 [OPAM]: https://opam.ocaml.org/
+[NonGNU ELPA]: https://elpa.nongnu.org/
 [MELPA]: https://melpa.org/
 [Init File]: https://www.gnu.org/software/emacs/manual/html_node/emacs/Init-File.html
