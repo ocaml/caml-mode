@@ -14,13 +14,6 @@
 
 ; An emacs-lisp complement to the "-annot" option of ocamlc and ocamlopt.
 
-;; XEmacs compatibility
-
-(eval-and-compile
-  (if (featurep 'xemacs)
-      (require 'caml-xemacs)
-    (require 'caml-emacs)))
-
 (defvar caml-types-buffer)              ;Forward declaration.
 
 (defun caml-types-feedback (info format)
@@ -167,8 +160,8 @@ See `caml-types-location-re' for annotation file format."
   (let* ((target-buf (current-buffer))
          (target-file (file-name-nondirectory (buffer-file-name)))
          (target-line (1+ (count-lines (point-min)
-                                       (caml-line-beginning-position))))
-         (target-bol (caml-line-beginning-position))
+                                       (line-beginning-position))))
+         (target-bol (line-beginning-position))
          (target-cnum (point)))
     (caml-types-preprocess (buffer-file-name))
     (setq caml-types-buffer (get-buffer-create caml-types-buffer-name))
@@ -189,7 +182,7 @@ See `caml-types-location-re' for annotation file format."
              (not (window-live-p (get-buffer-window caml-types-buffer))))
         (display-buffer caml-types-buffer))
     (unwind-protect
-        (caml-sit-for 60)
+        (sit-for 60)
       (delete-overlay caml-types-expr-ovl))))
 
 (defun caml-types-show-call (arg)
@@ -208,8 +201,8 @@ See `caml-types-location-re' for annotation file format."
   (let* ((target-buf (current-buffer))
          (target-file (file-name-nondirectory (buffer-file-name)))
          (target-line (1+ (count-lines (point-min)
-                                       (caml-line-beginning-position))))
-         (target-bol (caml-line-beginning-position))
+                                       (line-beginning-position))))
+         (target-bol (line-beginning-position))
          (target-cnum (point)))
     (caml-types-preprocess (buffer-file-name))
     (setq caml-types-buffer (get-buffer-create caml-types-buffer-name))
@@ -230,7 +223,7 @@ See `caml-types-location-re' for annotation file format."
              (not (window-live-p (get-buffer-window caml-types-buffer))))
         (display-buffer caml-types-buffer))
     (unwind-protect
-        (caml-sit-for 60)
+        (sit-for 60)
       (delete-overlay caml-types-expr-ovl))))
 
 (defun caml-types-show-ident (arg)
@@ -249,8 +242,8 @@ See `caml-types-location-re' for annotation file format."
   (let* ((target-buf (current-buffer))
          (target-file (file-name-nondirectory (buffer-file-name)))
          (target-line (1+ (count-lines (point-min)
-                                       (caml-line-beginning-position))))
-         (target-bol (caml-line-beginning-position))
+                                       (line-beginning-position))))
+         (target-bol (line-beginning-position))
          (target-cnum (point)))
     (caml-types-preprocess (buffer-file-name))
     (setq caml-types-buffer (get-buffer-create caml-types-buffer-name))
@@ -325,7 +318,7 @@ See `caml-types-location-re' for annotation file format."
              (not (window-live-p (get-buffer-window caml-types-buffer))))
         (display-buffer caml-types-buffer))
     (unwind-protect
-        (caml-sit-for 60)
+        (sit-for 60)
       (delete-overlay caml-types-expr-ovl)
       (delete-overlay caml-types-def-ovl)
       (delete-overlay caml-types-scope-ovl))))
@@ -606,6 +599,15 @@ corresponding .annot file."
      (+ (* (mod (cadr time) 1000) 1000)
                   (/ (cadr (cdr time)) 1000))))
 
+(defun caml--release-event-p (original event)
+  (and (equal (event-basic-type original) (event-basic-type event))
+       (let ((modifiers  (event-modifiers event)))
+         (or (member 'drag modifiers)
+             (member 'click modifiers)))))
+
+(defun caml--event-point-end (e) (posn-point (event-end e)))
+(defun caml--event-window (e) (posn-window (event-start e)))
+
 (defun caml-types-explore (event)
   "Explore type annotations by mouse dragging.
 
@@ -618,14 +620,14 @@ The function uses two overlays.
  . Another overlay delimits the current node under the mouse (whose type
    annotation is being displayed)."
   (interactive "e")
-  (set-buffer (window-buffer (caml-event-window event)))
+  (set-buffer (window-buffer (caml--event-window event)))
   (let* ((target-buf (current-buffer))
          (target-file (file-name-nondirectory (buffer-file-name)))
          (target-line) (target-bol)
          target-pos
          limits cnum node mes type
          region
-         (window (caml-event-window event))
+         (window (caml--event-window event))
          target-tree
          (speed 100)
          (last-time (caml-types-time))
@@ -638,29 +640,29 @@ The function uses two overlays.
           (setq caml-types-buffer (get-buffer-create caml-types-buffer-name))
           ;; (message "Drag the mouse to explore types")
           (unwind-protect
-              (caml-track-mouse
+              (track-mouse
                (while event
                  (cond
                   ;; we ignore non mouse events
-                  ((caml-ignore-event-p event))
+                  ((integer-or-marker-p event))
                   ;; we stop when the original button is released
-                  ((caml-release-event-p original-event event)
+                  ((caml--release-event-p original-event event)
                    (setq event nil))
                   ;; we scroll when the motion is outside the window
-                  ((and (caml-mouse-movement-p event)
-                        (not (and (equal window (caml-event-window event))
+                  ((and (mouse-movement-p event)
+                        (not (and (equal window (caml--event-window event))
                                   (integer-or-marker-p
-                                   (caml-event-point-end event)))))
-                   (let* ((win (caml-window-edges window))
+                                   (caml--event-point-end event)))))
+                   (let* ((win (window-edges window))
                           (top (nth 1 win))
                           (bottom (- (nth 3 win) 1))
                           mouse
                           time)
                      (while (and
-                             (caml-sit-for 0 (/ 500 speed))
+                             (sit-for 0 (/ 500 speed))
                              (setq time (caml-types-time))
                              (> (- time last-time) (/ 500 speed))
-                             (setq mouse (caml-mouse-vertical-position))
+                             (setq mouse (cddr (mouse-position)))
                              (or (< mouse top) (>= mouse bottom)))
                        (setq last-time time)
                        (cond
@@ -677,9 +679,9 @@ The function uses two overlays.
                        (setq speed (* speed speed)))))
                   ;; main action, when the motion is inside the window
                   ;; or on original button down event
-                  ((or (caml-mouse-movement-p event)
+                  ((or (mouse-movement-p event)
                        (equal original-event event))
-                   (setq cnum (caml-event-point-end event))
+                   (setq cnum (caml--event-point-end event))
                    (if (and region
                             (<= (car region) cnum) (< cnum (cdr region)))
                        ;; mouse remains in outer region
@@ -687,7 +689,7 @@ The function uses two overlays.
                      ;; otherwise, reset the outer region
                      (setq region
                            (caml-types-typed-make-overlay
-                            target-buf (caml-event-point-start event))))
+                            target-buf (posn-point (event-start event)))))
                    (if
                        (and limits
                             (>= cnum (car limits)) (< cnum (cdr limits)))
@@ -696,7 +698,7 @@ The function uses two overlays.
                      ;; recompute the inner region and type annotation
                      (setq target-bol
                            (save-excursion
-                             (goto-char cnum) (caml-line-beginning-position))
+                             (goto-char cnum) (line-beginning-position))
                            target-line (1+ (count-lines (point-min)
                                                         target-bol))
                            target-pos
@@ -728,7 +730,7 @@ The function uses two overlays.
                        (insert type)))
                    (message mes)))
                  ;; we read next event, unless it is nil, and loop back.
-                 (if event (setq event (caml-read-event)))))
+                 (if event (setq event (read-event)))))
             ;; delete overlays at end of exploration
             (delete-overlay caml-types-expr-ovl)
             (delete-overlay caml-types-typed-ovl)))
@@ -741,7 +743,7 @@ The function uses two overlays.
       ;; Not sure it is robust to loop for mouse release after an error
       ;; occurred, as is done for exploration.
       ;; So far, we just ignore next event. (Next line also be uncommenting.)
-      (if event (caml-read-event)))))
+      (if event (read-event)))))
 
 (defun caml-types-typed-make-overlay (target-buf pos)
   (interactive "p")

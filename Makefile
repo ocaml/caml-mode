@@ -22,8 +22,7 @@ OPAM_FILE = packages/caml-mode/caml-mode.$(VERSION)/opam
 
 # Files to install
 FILES=	caml-font.el caml.el camldebug.el      \
-	inf-caml.el caml-help.el caml-types.el \
-	caml-xemacs.el caml-emacs.el
+	inf-caml.el caml-help.el caml-types.el
 
 INSTALL_DIR ?= $(shell opam var share)/emacs/site-lisp
 INSTALL_BIN ?= $(shell opam var bin)
@@ -57,8 +56,6 @@ INSTALL_RM_R = $(RM) -r
 # Command for byte-compiling the files
 COMPILECMD=(progn \
 	      (setq load-path (cons "." load-path)) \
-	      (byte-compile-file "caml-xemacs.el") \
-	      (byte-compile-file "caml-emacs.el") \
 	      (byte-compile-file "caml.el") \
 	      (byte-compile-file "inf-caml.el") \
 	      (byte-compile-file "caml-help.el") \

@@ -43,11 +43,6 @@
 
 ;;; Code:
 
-(eval-and-compile
-  (if (featurep 'xemacs)
-      (require 'caml-xemacs)
-    (require 'caml-emacs)))
-
 (require 'info)
 (require 'view)
 
@@ -593,7 +588,7 @@ current buffer using \\[ocaml-qualified-identifier]."
   (let ((window (selected-window))
         (info-section (assoc module (ocaml-info-alist))))
     (if info-section
-        (caml-info-other-window (cdr info-section))
+        (info-other-window (cdr info-section))
       (ocaml-visible-modules)
       (let* ((module-info
               (or (assoc module (ocaml-module-alist))
@@ -777,8 +772,9 @@ buffer positions."
 (defun ocaml-link-goto (click)
   "Follow link at point."
   (interactive "e")
-  (let* ((pos (caml-event-point-start click))
-         (win (caml-event-window click))
+  (let* ((pos-click (event-start click))
+         (pos (posn-point pos-click))
+         (win (posn-window pos-click))
          (buf (window-buffer win))
          (window (selected-window))
          (link))

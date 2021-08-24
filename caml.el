@@ -1,4 +1,4 @@
-;;; caml.el --- Caml mode for GNU Emacs and XEmacs -*- lexical-binding: t; -*-
+;;; caml.el --- Caml mode for GNU Emacs -*- lexical-binding: t; -*-
 
 ;; Copyright (C) 1997-2017 Institut National de Recherche en Informatique et en Automatique.
 
@@ -7,7 +7,7 @@
 ;;         Damien Doligez <damien.doligez@inria.fr>
 ;; Maintainer: Christophe Troestler <Christophe.Troestler@umons.ac.be>
 ;; Created: July 1993
-;; Package-Requires: ((emacs "24.3") (cl-lib "0.5"))
+;; Package-Requires: ((emacs "24.3"))
 ;; Version: 4.8
 ;; Keywords: OCaml
 ;; Homepage: https://github.com/ocaml/caml-mode
@@ -305,9 +305,6 @@ have `caml-electric-indent' on, which see.")
     ;;that way we get out effect even when we do \C-x` in compilation buffer
     ;;  (define-key map "\C-x`" 'caml-next-error)
 
-    (define-key map (if (featurep 'xemacs) 'backspace "\177")
-      'backward-delete-char-untabify)
-
     ;; caml-types
     (define-key map [?\C-c?\C-t] 'caml-types-show-type)  ; "type"
     (define-key map [?\C-c?\C-f] 'caml-types-show-call)  ; "function"
@@ -341,93 +338,61 @@ have `caml-electric-indent' on, which see.")
     (define-key map "\M-\C-q" 'caml-indent-phrase)
     (define-key map "\M-\C-x" 'caml-eval-phrase)
 
-    (if (featurep 'xemacs) nil
-      (let ((menu (make-sparse-keymap "Caml"))
-            (forms (make-sparse-keymap "Forms")))
-        (define-key map "\C-c\C-d" 'caml-show-imenu)
-        (define-key map [menu-bar] (make-sparse-keymap))
-        (define-key map [menu-bar caml] (cons "Caml" menu))
-        ;; caml-help
+    (let ((menu (make-sparse-keymap "Caml"))
+          (forms (make-sparse-keymap "Forms")))
+      (define-key map "\C-c\C-d" 'caml-show-imenu)
+      (define-key map [menu-bar] (make-sparse-keymap))
+      (define-key map [menu-bar caml] (cons "Caml" menu))
+      ;; caml-help
 
-        (define-key menu [open] '("Open add path" . ocaml-add-path ))
-        (define-key menu [close]
-          '("Close module for help" . ocaml-close-module))
-        (define-key menu [open] '("Open module for help" . ocaml-open-module))
-        (define-key menu [help] '("Help for identifier" . caml-help))
-        (define-key menu [complete] '("Complete identifier" . caml-complete))
-        (define-key menu [separator-help] '("---"))
+      (define-key menu [open] '("Open add path" . ocaml-add-path ))
+      (define-key menu [close]
+        '("Close module for help" . ocaml-close-module))
+      (define-key menu [open] '("Open module for help" . ocaml-open-module))
+      (define-key menu [help] '("Help for identifier" . caml-help))
+      (define-key menu [complete] '("Complete identifier" . caml-complete))
+      (define-key menu [separator-help] '("---"))
 
-        ;; caml-types
-        (define-key menu [show-type]
-          '("Show type at point" . caml-types-show-type ))
-        (define-key menu [separator-types] '("---"))
+      ;; caml-types
+      (define-key menu [show-type]
+        '("Show type at point" . caml-types-show-type ))
+      (define-key menu [separator-types] '("---"))
 
-        ;; others
-        (define-key menu [camldebug] '("Call debugger..." . camldebug))
-        (define-key menu [run-caml] '("Start subshell..." . run-caml))
-        (define-key menu [compile] '("Compile..." . compile))
-        (define-key menu [switch-view]
-          '("Switch view" . caml-find-alternate-file))
-        (define-key menu [separator-format] '("--"))
-        (define-key menu [forms] (cons "Forms" forms))
-        (define-key menu [show-imenu] '("Show index" . caml-show-imenu))
-        (put 'caml-show-imenu 'menu-enable '(not caml-imenu-shown))
-        (define-key menu [show-subshell] '("Show subshell" . caml-show-subshell))
-        (put 'caml-show-subshell 'menu-enable 'caml-shell-active)
-        (define-key menu [eval-phrase] '("Eval phrase" . caml-eval-phrase))
-        (put 'caml-eval-phrase 'menu-enable 'caml-shell-active)
-        (define-key menu [indent-phrase] '("Indent phrase" . caml-indent-phrase))
-        (define-key forms [while]
-          '("while .. do .. done" . caml-insert-while-form))
-        (define-key forms [try] '("try .. with .." . caml-insert-try-form))
-        (define-key forms [match] '("match .. with .." . caml-insert-match-form))
-        (define-key forms [let] '("let .. in .." . caml-insert-let-form))
-        (define-key forms [if] '("if .. then .. else .." . caml-insert-if-form))
-        (define-key forms [begin] '("for .. do .. done" . caml-insert-for-form))
-        (define-key forms [begin] '("begin .. end" . caml-insert-begin-form))))
+      ;; others
+      (define-key menu [camldebug] '("Call debugger..." . camldebug))
+      (define-key menu [run-caml] '("Start subshell..." . run-caml))
+      (define-key menu [compile] '("Compile..." . compile))
+      (define-key menu [switch-view]
+        '("Switch view" . caml-find-alternate-file))
+      (define-key menu [separator-format] '("--"))
+      (define-key menu [forms] (cons "Forms" forms))
+      (define-key menu [show-imenu] '("Show index" . caml-show-imenu))
+      (put 'caml-show-imenu 'menu-enable '(not caml-imenu-shown))
+      (define-key menu [show-subshell] '("Show subshell" . caml-show-subshell))
+      (put 'caml-show-subshell 'menu-enable 'caml-shell-active)
+      (define-key menu [eval-phrase] '("Eval phrase" . caml-eval-phrase))
+      (put 'caml-eval-phrase 'menu-enable 'caml-shell-active)
+      (define-key menu [indent-phrase] '("Indent phrase" . caml-indent-phrase))
+      (define-key forms [while]
+        '("while .. do .. done" . caml-insert-while-form))
+      (define-key forms [try] '("try .. with .." . caml-insert-try-form))
+      (define-key forms [match] '("match .. with .." . caml-insert-match-form))
+      (define-key forms [let] '("let .. in .." . caml-insert-let-form))
+      (define-key forms [if] '("if .. then .. else .." . caml-insert-if-form))
+      (define-key forms [begin] '("for .. do .. done" . caml-insert-for-form))
+      (define-key forms [begin] '("begin .. end" . caml-insert-begin-form)))
     map)
   "Keymap used in Caml mode.")
 
-(defvar caml-mode-xemacs-menu
-  (if (featurep 'xemacs)
-      '("Caml"
-        [ "Indent phrase" caml-indent-phrase :keys "C-M-q" ]
-        [ "Eval phrase" caml-eval-phrase
-          :active caml-shell-active :keys "C-M-x" ]
-        [ "Show subshell" caml-show-subshell caml-shell-active ]
-        ("Forms"
-         [ "while .. do .. done" caml-insert-while-form t]
-         [ "try .. with .." caml-insert-try-form t ]
-         [ "match .. with .." caml-insert-match-form t ]
-         [ "let .. in .." caml-insert-let-form t ]
-         [ "if .. then .. else .." caml-insert-if-form t ]
-         [ "for .. do .. done" caml-insert-for-form t ]
-         [ "begin .. end" caml-insert-begin-form t ])
-        "---"
-        [ "Switch view" caml-find-alternate-file t ]
-        [ "Compile..." compile t ]
-        [ "Start subshell..." run-caml t ]
-        "---"
-        [ "Show type at point" caml-types-show-type t ]
-        "---"
-        [ "Complete identifier" caml-complete t ]
-        [ "Help for identifier" caml-help t ]
-        [ "Add path for documentation" ocaml-add-path t ]
-        [ "Open module for documentation" ocaml-open t ]
-        [ "Close module for documentation" ocaml-close t ]
-        ))
-  "Menu to add to the menubar when running Xemacs.")
-
 (defvar caml-mode-syntax-table
-  (let ((st (make-syntax-table))
-        (n (if (featurep 'xemacs) "" "n")))
+  (let ((st (make-syntax-table)))
     ;; backslash is an escape sequence
     (modify-syntax-entry ?\\ "\\" st)
     ;; ( is first character of comment start
-    (modify-syntax-entry ?\( (concat "()1" n) st)
+    (modify-syntax-entry ?\( "()1n" st)
     ;; * is second character of comment start,
     ;; and first character of comment end
-    (modify-syntax-entry ?*  (concat ". 23" n) st)
+    (modify-syntax-entry ?* ". 23n" st)
     ;; ) is last character of comment end
     (modify-syntax-entry ?\) ")(4" st)
     ;; backquote was a string-like delimiter (for character literals)
@@ -467,8 +432,7 @@ have `caml-electric-indent' on, which see.")
 
 ;;; The major mode
 (eval-when-compile
-  (if (featurep 'xemacs) nil
-    (require 'imenu)))
+  (require 'imenu))
 
 ;;
 (defvar caml-mode-hook nil
@@ -503,21 +467,13 @@ have `caml-electric-indent' on, which see.")
   ;garrigue 27-11-96
   (setq case-fold-search nil)
   ;garrigue july 97
-  (if (featurep 'xemacs)
-      (if (and (featurep 'menubar)
-               current-menubar)
-          (progn
-            ;; make a local copy of the menubar, so our modes don't
-            ;; change the global menubar
-            (set-buffer-menubar current-menubar)
-            (add-submenu nil caml-mode-xemacs-menu)))
-    ;imenu support (not for Xemacs)
-    (make-local-variable 'imenu-create-index-function)
-    (setq imenu-create-index-function #'caml-create-index-function)
-    (make-local-variable 'imenu-generic-expression)
-    (setq imenu-generic-expression caml-imenu-search-regexp)
-    (if (and caml-imenu-enable (< (buffer-size) 10000))
-        (caml-show-imenu))))
+  ;; imenu support
+  (make-local-variable 'imenu-create-index-function)
+  (setq imenu-create-index-function #'caml-create-index-function)
+  (make-local-variable 'imenu-generic-expression)
+  (setq imenu-generic-expression caml-imenu-search-regexp)
+  (if (and caml-imenu-enable (< (buffer-size) 10000))
+      (caml-show-imenu)))
 
 
 ;; Disabled because it assumes make and does not play well with ocamlbuild.
