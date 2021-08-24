@@ -1,6 +1,6 @@
 opam-version: "2.0"
 name: "caml-mode"
-version: "4.06"
+version: "VERSION"
 authors: [
   "Damien Doligez"
   "Jacques Garrigue"
@@ -10,16 +10,16 @@ authors: [
 ]
 maintainer: "Christophe.Troestler@umons.ac.be"
 license: "GNU General Public License"
-homepage: "https://github.com/ocaml/ocaml"
-dev-repo: "git+https://github.com/ocaml/ocaml.git"
-bug-reports: "http://caml.inria.fr/mantis/"
+homepage: "https://github.com/ocaml/caml-mode"
+dev-repo: "git+https://github.com/ocaml/caml-mode.git"
+bug-reports: "https://github.com/ocaml/caml-mode/issues"
 install: [
-  [make "install" "EMACSDIR=%{share}%/emacs/site-lisp"]
-  [make "install-ocamltags" "BINDIR=%{bin}%"]
+  [make "install" "INSTALL_DIR=%{share}%/emacs/site-lisp"]
+  [make "install-ocamltags" "INSTALL_BIN=%{bin}%"]
 ]
 remove: [
-  [make "uninstall" "EMACSDIR=%{share}%/emacs/site-lisp"]
-  [make "uninstall-ocamltags" "BINDIR=%{bin}%"]
+  [make "uninstall" "INSTALL_DIR=%{share}%/emacs/site-lisp"]
+  [make "uninstall-ocamltags" "INSTALL_BIN=%{bin}%"]
 ]
 depends: ["ocaml" "conf-emacs"]
 post-messages: """
