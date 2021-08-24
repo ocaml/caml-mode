@@ -48,6 +48,8 @@
       (require 'caml-xemacs)
     (require 'caml-emacs)))
 
+(require 'info)
+
 ;; Loading or building databases.
 ;;
 
