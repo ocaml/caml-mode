@@ -12,13 +12,14 @@
 #*                                                                        *
 #**************************************************************************
 
-VERSION = $(shell grep "^version" caml-mode.opam \
-	| sed -e 's/version: *"\([^"]*\)"/\1/')
+VERSION = $(shell grep "^;; *Version" caml.el \
+	| sed -e 's/;; *Version: *\([^ \t]*\)/\1/')
 DESCRIPTION = $(shell grep ';;; caml.el ---' caml.el \
 	| sed 's/[^-]*--- *\(.*\)/\1/')
 DIST_DIR = caml-mode-$(VERSION)
 OPAM_DIR = caml-mode.$(VERSION)
 TARBALL = caml-mode-$(VERSION).tgz
+OPAM_FILE = packages/caml-mode/caml-mode.$(VERSION)/opam
 
 # Files to install
 FILES=	caml-font.el caml.el camldebug.el      \
@@ -50,8 +51,9 @@ endif
 endif
 EMACS ?= emacs
 
-# Where to install ocamltags script
-SCRIPTDIR = $(BINDIR)
+INSTALL_MKDIR = mkdir -p
+INSTALL_DATA = $(CP)
+INSTALL_RM_R = $(RM) -r
 
 # Command for byte-compiling the files
 COMPILECMD=(progn \
@@ -101,17 +103,6 @@ ocamltags:	ocamltags.in
 install-ocamltags: ocamltags
 	$(INSTALL_DATA) ocamltags $(SCRIPTDIR)/ocamltags
 
-# OPAM
-.PHONY: opam
-opam: $(TARBALL)
-	mkdir -p $(OPAM_DIR)
-	cp -a caml-mode.opam $(OPAM_DIR)/opam
-	echo "url {" >> $(OPAM_DIR)/opam
-	echo "  src: \"`pwd`/https://github.com/ocaml/caml-mode/releases/download/$(VERSION)/$(TARBALL)\"" >> $(OPAM_DIR)/opam
-	echo "  checksum: \"md5=`md5sum $(TARBALL) | cut -d ' ' -f 1`\"" \
-	  >> $(OPAM_DIR)/opam
-	echo "}" >> $(OPAM_DIR)/opam
-
 $(TARBALL): $(DIST_FILES)
 	mkdir -p $(DIST_DIR)
 	for f in $(DIST_FILES); do cp $$f $(DIST_DIR); done
@@ -123,7 +114,21 @@ $(TARBALL): $(DIST_FILES)
 # This is for testing purposes
 compile-only:
 	$(EMACS) --batch --eval '$(COMPILECMD)'
+submit: $(TARBALL)
+	@if [ ! -d packages/ ]; then \
+	  echo "Make a symbolic link packages → OPAM repository/packages"; \
+	  exit 1; \
+	fi
+	$(INSTALL_MKDIR) $(dir $(OPAM_FILE))
+	sed -e "s/VERSION/$(VERSION)/" caml-mode.opam > $(OPAM_FILE)
+	echo "url {" >> $(OPAM_FILE)
+	echo "  src: \"https://github.com/ocaml/caml-mode/releases/download/$(VERSION)/$(TARBALL)\"" >> $(OPAM_FILE)
+	echo "  checksum: \"md5=`md5sum $(TARBALL) | cut -d ' ' -f 1`\"" \
+	  >> $(OPAM_FILE)
+	echo "}" >> $(OPAM_FILE)
 
 clean:
 	rm -f ocamltags *~ \#*# *.elc
-	$(RM) -r $(TARBALL) $(OPAM_DIR)
+	$(RM) -r $(TARBALL)
+
+
