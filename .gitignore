@@ -3,3 +3,4 @@
 /caml-autoloads.el
 *.tgz
 caml-mode.*/
+packages
