@@ -1,5 +1,6 @@
 [![NonGNU ELPA](https://elpa.nongnu.org/nongnu/caml.svg)](https://elpa.nongnu.org/nongnu/caml.html)
 [![MELPA](https://melpa.org/packages/caml-badge.svg)](https://melpa.org/#/caml)
+[![DebianBadge](https://badges.debian.net/badges/debian/stable/elpa-caml/version.svg)](https://packages.debian.org/stable/elpa-caml)
 
 OCaml Emacs mode
 ================
