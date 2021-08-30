@@ -73,10 +73,10 @@
  (window-system
   (make-face 'camldebug-event)
   (make-face 'camldebug-underline)
-  (if (not (face-differs-from-default-p 'camldebug-event))
-      (invert-face 'camldebug-event))
-  (if (not (face-differs-from-default-p 'camldebug-underline))
-      (set-face-underline 'camldebug-underline t))
+  (unless (face-differs-from-default-p 'camldebug-event)
+    (invert-face 'camldebug-event))
+  (unless (face-differs-from-default-p 'camldebug-underline)
+    (set-face-underline 'camldebug-underline t))
   (setq camldebug-overlay-event (make-overlay 1 1))
   (overlay-put camldebug-overlay-event 'face 'camldebug-event)
   (setq camldebug-overlay-under (make-overlay 1 1))
@@ -212,9 +212,7 @@ representation is simply concatenated with the COMMAND."
   ;gob up stupid questions :-)
   (setq camldebug-filter-accumulator
         (concat camldebug-filter-accumulator string))
-  (if (not (string-match "\\(.* \\)(y or n) "
-                         camldebug-filter-accumulator))
-      nil
+  (when (string-match "\\(.* \\)(y or n) " camldebug-filter-accumulator)
     (setq camldebug-kill-output
           (cons t (match-string 1 camldebug-filter-accumulator)))
     (setq camldebug-filter-accumulator ""))
@@ -255,23 +253,20 @@ representation is simply concatenated with the COMMAND."
   ;accumulate onto previous output
   (setq camldebug-filter-accumulator
         (concat camldebug-filter-accumulator string))
-  (if (not (or (string-match (concat "\\(\n\\|\\`\\)[ \t]*\\([0-9]+\\)[ \t]+"
-                                     camldebug-goto-position
-                                     "-[0-9]+[ \t]*\\(before\\).*\n")
-                             camldebug-filter-accumulator)
-               (string-match (concat "\\(\n\\|\\`\\)[ \t]*\\([0-9]+\\)"
-                                     "[ \t]+[0-9]+-"
-                                     camldebug-goto-position
-                                     "[ \t]*\\(after\\).*\n")
-                             camldebug-filter-accumulator)))
-           nil
+  (when (or (string-match (concat "\\(\n\\|\\`\\)[ \t]*\\([0-9]+\\)[ \t]+"
+                                  camldebug-goto-position
+                                  "-[0-9]+[ \t]*\\(before\\).*\n")
+                          camldebug-filter-accumulator)
+            (string-match (concat "\\(\n\\|\\`\\)[ \t]*\\([0-9]+\\)"
+                                  "[ \t]+[0-9]+-"
+                                  camldebug-goto-position
+                                  "[ \t]*\\(after\\).*\n")
+                          camldebug-filter-accumulator))
     (setq camldebug-goto-output
           (match-string 2 camldebug-filter-accumulator))
     (setq camldebug-filter-accumulator
           (substring camldebug-filter-accumulator (1- (match-end 0)))))
-  (if (not (string-match comint-prompt-regexp
-                         camldebug-filter-accumulator))
-      nil
+  (when (string-match comint-prompt-regexp camldebug-filter-accumulator)
     (setq camldebug-goto-output (or camldebug-goto-output 'fail))
     (setq camldebug-filter-accumulator ""))
   (if (string-match "\n\\(.*\\)\\'" camldebug-filter-accumulator)
@@ -344,20 +339,17 @@ buffer, then try to obtain the time from context around point."
 (defun camldebug-delete-filter (string)
   (setq camldebug-filter-accumulator
         (concat camldebug-filter-accumulator string))
-  (if (not (string-match
-            (concat "\\(\n\\|\\`\\)[ \t]*\\([0-9]+\\)[ \t]+[0-9]+[ \t]*in "
-                    (regexp-quote camldebug-delete-file)
-                    ", character "
-                    camldebug-delete-position "\n")
-            camldebug-filter-accumulator))
-      nil
+  (when (string-match
+         (concat "\\(\n\\|\\`\\)[ \t]*\\([0-9]+\\)[ \t]+[0-9]+[ \t]*in "
+                 (regexp-quote camldebug-delete-file)
+                 ", character "
+                 camldebug-delete-position "\n")
+         camldebug-filter-accumulator)
     (setq camldebug-delete-output
           (match-string 2 camldebug-filter-accumulator))
     (setq camldebug-filter-accumulator
           (substring camldebug-filter-accumulator (1- (match-end 0)))))
-  (if (not (string-match comint-prompt-regexp
-                         camldebug-filter-accumulator))
-      nil
+  (when (string-match comint-prompt-regexp camldebug-filter-accumulator)
     (setq camldebug-delete-output (or camldebug-delete-output 'fail))
     (setq camldebug-filter-accumulator ""))
   (if (string-match "\n\\(.*\\)\\'" camldebug-filter-accumulator)
@@ -435,9 +427,7 @@ around point."
     (setq camldebug-filter-accumulator
           (substring camldebug-filter-accumulator
                      (1- (match-end 0)))))
-  (if (not (string-match comint-prompt-regexp
-                         camldebug-filter-accumulator))
-      nil
+  (when (string-match comint-prompt-regexp camldebug-filter-accumulator)
     (setq camldebug-complete-list
           (or camldebug-complete-list 'fail))
     (setq camldebug-filter-accumulator ""))
