@@ -1,6 +1,4 @@
 opam-version: "2.0"
-name: "caml-mode"
-version: "VERSION"
 authors: [
   "Damien Doligez"
   "Jacques Garrigue"
@@ -9,7 +7,7 @@ authors: [
   "Ian T Zimmerman"
 ]
 maintainer: "Christophe.Troestler@umons.ac.be"
-license: "GNU General Public License"
+license: "GPL-2.0-or-later"
 homepage: "https://github.com/ocaml/caml-mode"
 dev-repo: "git+https://github.com/ocaml/caml-mode.git"
 bug-reports: "https://github.com/ocaml/caml-mode/issues"
@@ -25,5 +23,6 @@ depends: ["ocaml" "conf-emacs"]
 post-messages: """
 If you have not yet done so, please add in ~/.emacs.d/init.el or
 in ~/.emacs to following line:
-    (add-to-list 'load-path "%{share}%/emacs/site-lisp/")""" {success}
+    (add-to-list 'load-path "%{share}%/emacs/site-lisp/")
+""" {success & !user-setup:installed}
 synopsis: "SYNOPSIS"
