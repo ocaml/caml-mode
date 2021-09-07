@@ -253,17 +253,26 @@ representation is simply concatenated with the COMMAND."
   ;accumulate onto previous output
   (setq camldebug-filter-accumulator
         (concat camldebug-filter-accumulator string))
-  (when (or (string-match (concat "\\(\n\\|\\`\\)[ \t]*\\([0-9]+\\)[ \t]+"
-                                  camldebug-goto-position
-                                  "-[0-9]+[ \t]*\\(before\\).*\n")
-                          camldebug-filter-accumulator)
-            (string-match (concat "\\(\n\\|\\`\\)[ \t]*\\([0-9]+\\)"
-                                  "[ \t]+[0-9]+-"
-                                  camldebug-goto-position
-                                  "[ \t]*\\(after\\).*\n")
-                          camldebug-filter-accumulator))
-    (setq camldebug-goto-output
-          (match-string 2 camldebug-filter-accumulator))
+  ;;    Address  Characters        Kind      Repr.
+  ;;     14452     64-82      before/fun
+  ;;     14584    182-217      after/ret
+  ;;0:     30248     -1--1          pseudo
+  ;;0:     30076     64-82      before/fun
+  (when (or (string-match
+             (concat "\\(?:\n\\|\\`\\)[ \t]*"
+                     "\\([0-9]+\\)\\(?::[ \t]*\\([0-9]+\\)\\)?[ \t]+"
+                     camldebug-goto-position
+                     "-[0-9]+[ \t]*before.*\n")
+             camldebug-filter-accumulator)
+            (string-match
+             (concat "\\(?:\n\\|\\`\\)[ \t]*"
+                     "\\([0-9]+\\)\\(?::[ \t]*\\([0-9]+\\)\\)?[ \t]+[0-9]+-"
+                     camldebug-goto-position
+                     "[ \t]*after.*\n")
+             camldebug-filter-accumulator))
+    (let ((id (match-string 1 camldebug-filter-accumulator))
+          (pos (match-string 2 camldebug-filter-accumulator)))
+      (setq camldebug-goto-output (if pos (concat id ":" pos) id)))
     (setq camldebug-filter-accumulator
           (substring camldebug-filter-accumulator (1- (match-end 0)))))
   (when (string-match comint-prompt-regexp camldebug-filter-accumulator)
@@ -295,8 +304,9 @@ buffer, then try to obtain the time from context around point."
         (save-selected-window
           (select-window (get-buffer-window current-camldebug-buffer))
           (save-excursion
-            (if (re-search-backward "^Time : [0-9]+ - pc : [0-9]+ "
-                                    nil t (- 1 ntime))
+            (if (re-search-backward
+                 "^Time *: [0-9]+ - pc *: [0-9]+\\(?::[0-9]+\\)? "
+                 nil t (- 1 ntime))
                 (camldebug-goto nil)
               (error "I don't have %d times in my history"
                      (- 1 ntime))))))))
@@ -305,7 +315,8 @@ buffer, then try to obtain the time from context around point."
                    ((eobp) 0)
                    ((save-excursion
                       (beginning-of-line 1)
-                      (looking-at "^Time : \\([0-9]+\\) - pc : [0-9]+ "))
+                      (looking-at
+                       "^Time *: \\([0-9]+\\) - pc *: [0-9]+\\(?::[0-9]+\\)? "))
                     (string-to-number (match-string 1)))
                    ((string-to-number (camldebug-format-command "%e"))))))
         (camldebug-call "goto" nil time)))
@@ -323,7 +334,7 @@ buffer, then try to obtain the time from context around point."
             (accept-process-output proc))
           (setq address (if (eq camldebug-goto-output 'fail) nil
                           (re-search-backward
-                           (concat "^Time : \\([0-9]+\\) - pc : "
+                           (concat "^Time *: \\([0-9]+\\) - pc *: "
                                    camldebug-goto-output
                                    " - module "
                                    module "$")
@@ -340,13 +351,17 @@ buffer, then try to obtain the time from context around point."
   (setq camldebug-filter-accumulator
         (concat camldebug-filter-accumulator string))
   (when (string-match
-         (concat "\\(\n\\|\\`\\)[ \t]*\\([0-9]+\\)[ \t]+[0-9]+[ \t]*in "
+         ;; Num    Address  Where
+         ;;  1      14552  file u.ml, line 5, characters 1-34
+         ;;  1 0:     30176  file u.ml, line 5, characters 1-34
+         (concat "\\(?:\n\\|\\`\\)[ \t]*\\([0-9]+\\)[ \t]+"
+                 "[0-9]+\\(?::[ \t]*[0-9]+\\)?[ \t]+file +"
                  (regexp-quote camldebug-delete-file)
                  ", character "
                  camldebug-delete-position "\n")
          camldebug-filter-accumulator)
     (setq camldebug-delete-output
-          (match-string 2 camldebug-filter-accumulator))
+          (match-string 1 camldebug-filter-accumulator))
     (setq camldebug-filter-accumulator
           (substring camldebug-filter-accumulator (1- (match-end 0)))))
   (when (string-match comint-prompt-regexp camldebug-filter-accumulator)
@@ -378,13 +393,15 @@ around point."
     (let ((narg (camldebug-numeric-arg arg)))
       (if (> narg 0) (camldebug-call "delete" nil narg)
         (with-current-buffer current-camldebug-buffer
-          (if (re-search-backward "^Breakpoint [0-9]+ at [0-9]+ : file "
-                                  nil t (- 1 narg))
+          (if (re-search-backward
+               "^Breakpoint [0-9]+ at [0-9]+\\(?::[0-9]+\\)? *: file "
+               nil t (- 1 narg))
               (camldebug-delete nil)
             (error "I don't have %d breakpoints in my history"
                      (- 1 narg)))))))
    ((eq (current-buffer) current-camldebug-buffer)
-    (let* ((bpline "^Breakpoint \\([0-9]+\\) at [0-9]+ : file ")
+    (let* ((bpline
+            "^Breakpoint \\([0-9]+\\) at [0-9]+\\(?::[0-9]+\\)? *: file ")
            (arg (cond
                  ((eobp)
                   (save-excursion (re-search-backward bpline nil t))
