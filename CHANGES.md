@@ -1,3 +1,11 @@
+4.9 2021-09-7
+-------------
+
+* camldebug mode now recognize the new format of code pointers (#7).
+* Make the code ready to be distributed in NonGNU ELPA.
+* Many warnings fixed (thanks to Stefan Monnier) and minor code improvements.
+* XEmacs is no longer supported.
+
 Version 3.10.1
 --------------
 * use `caml-font.el` from Olivier Andrieu

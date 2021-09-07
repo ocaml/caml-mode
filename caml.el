@@ -8,7 +8,7 @@
 ;; Maintainer: Christophe Troestler <Christophe.Troestler@umons.ac.be>
 ;; Created: July 1993
 ;; Package-Requires: ((emacs "24.3"))
-;; Version: 4.8
+;; Version: 4.9
 ;; Keywords: OCaml
 ;; Homepage: https://github.com/ocaml/caml-mode
 
