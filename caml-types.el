@@ -595,9 +595,11 @@ corresponding .annot file."
   nil)
 
 (defun caml-types-time ()
-  (let ((time (current-time)))
+  (if (fboundp 'time-convert)
+      (mod (car (time-convert nil 1000)) 1000000)
+    (let ((time (current-time)))
      (+ (* (mod (cadr time) 1000) 1000)
-                  (/ (cadr (cdr time)) 1000))))
+                  (/ (cadr (cdr time)) 1000)))))
 
 (defun caml--release-event-p (original event)
   (and (equal (event-basic-type original) (event-basic-type event))
