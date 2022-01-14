@@ -644,17 +644,17 @@ See `imenu-create-index-function'."
     ;; build menu
     (mapc
      (lambda (pair)
-       (if (symbol-value (cdr pair))
+       (if (not (null (cdr pair)))
            (setq menu-alist
                  (cons
                   (cons (car pair)
-                        (sort (symbol-value (cdr pair)) 'imenu--sort-by-name))
+                        (sort (cdr pair) 'imenu--sort-by-name))
                   menu-alist))))
-     '(("Values" . value-alist)
-       ("Types" . type-alist)
-       ("Modules" . module-alist)
-       ("Methods" . method-alist)
-       ("Classes" . class-alist)))
+     `(("Values" . ,value-alist)
+       ("Types" . ,type-alist)
+       ("Modules" . ,module-alist)
+       ("Methods" . ,method-alist)
+       ("Classes" . ,class-alist)))
     (if all-alist (setq menu-alist (cons (cons "Index" all-alist) menu-alist)))
     (imenu-progress-message prev-pos 100 t)
     menu-alist))
