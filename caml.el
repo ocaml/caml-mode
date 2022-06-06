@@ -7,7 +7,7 @@
 ;;         Damien Doligez <damien.doligez@inria.fr>
 ;; Maintainer: Christophe Troestler <Christophe.Troestler@umons.ac.be>
 ;; Created: July 1993
-;; Package-Requires: ((emacs "24.3"))
+;; Package-Requires: ((emacs "24.4"))
 ;; Version: 4.10-snapshot
 ;; Keywords: OCaml
 ;; Homepage: https://github.com/ocaml/caml-mode
@@ -295,52 +295,52 @@ have `caml-electric-indent' on, which see.")
 
 (defvar caml-mode-map
   (let ((map (make-sparse-keymap)))
-    (define-key map "|" 'caml-electric-pipe)
-    (define-key map "}" 'caml-electric-pipe)
-    (define-key map "]" 'caml-electric-rb)
-    (define-key map "\t" 'caml-indent-command)
-    (define-key map [backtab] 'caml-unindent-command)
+    (define-key map "|" #'caml-electric-pipe)
+    (define-key map "}" #'caml-electric-pipe)
+    (define-key map "]" #'caml-electric-rb)
+    (define-key map "\t" #'caml-indent-command)
+    (define-key map [backtab] #'caml-unindent-command)
 
     ;;itz 04-21-96 instead of defining a new function, use defadvice
     ;;that way we get out effect even when we do \C-x` in compilation buffer
     ;;  (define-key map "\C-x`" 'caml-next-error)
 
     ;; caml-types
-    (define-key map [?\C-c?\C-t] 'caml-types-show-type)  ; "type"
-    (define-key map [?\C-c?\C-f] 'caml-types-show-call)  ; "function"
-    (define-key map [?\C-c?\C-l] 'caml-types-show-ident) ; "let"
+    (define-key map [?\C-c?\C-t] #'caml-types-show-type)  ; "type"
+    (define-key map [?\C-c?\C-f] #'caml-types-show-call)  ; "function"
+    (define-key map [?\C-c?\C-l] #'caml-types-show-ident) ; "let"
     ;; must be a mouse-down event. Can be any button and any prefix
-    (define-key map [?\C-c down-mouse-1] 'caml-types-explore)
+    (define-key map [?\C-c down-mouse-1] #'caml-types-explore)
     ;; caml-help
-    (define-key map [?\C-c?i] 'ocaml-add-path)
-    (define-key map [?\C-c?\]] 'ocaml-close-module)
-    (define-key map [?\C-c?\[] 'ocaml-open-module)
-    (define-key map [?\C-c?\C-h] 'caml-help)
-    (define-key map [?\C-c?\t] 'caml-complete)
+    (define-key map [?\C-c?i] #'ocaml-add-path)
+    (define-key map [?\C-c?\]] #'ocaml-close-module)
+    (define-key map [?\C-c?\[] #'ocaml-open-module)
+    (define-key map [?\C-c?\C-h] #'caml-help)
+    (define-key map [?\C-c?\t] #'caml-complete)
     ;; others
-    (define-key map "\C-cb" 'caml-insert-begin-form)
-    (define-key map "\C-cf" 'caml-insert-for-form)
-    (define-key map "\C-ci" 'caml-insert-if-form)
-    (define-key map "\C-cl" 'caml-insert-let-form)
-    (define-key map "\C-cm" 'caml-insert-match-form)
-    (define-key map "\C-ct" 'caml-insert-try-form)
-    (define-key map "\C-cw" 'caml-insert-while-form)
-    (define-key map "\C-c`" 'caml-goto-phrase-error)
-    (define-key map "\C-c\C-a" 'caml-find-alternate-file)
-    (define-key map "\C-c\C-c" 'compile)
-    (define-key map "\C-c\C-e" 'caml-eval-phrase)
-    (define-key map "\C-c\C-[" 'caml-backward-to-less-indent)
-    (define-key map "\C-c\C-]" 'caml-forward-to-less-indent)
-    (define-key map "\C-c\C-q" 'caml-indent-phrase)
-    (define-key map "\C-c\C-r" 'caml-eval-region)
-    (define-key map "\C-c\C-s" 'caml-show-subshell)
-    (define-key map "\M-\C-h" 'caml-mark-phrase)
-    (define-key map "\M-\C-q" 'caml-indent-phrase)
-    (define-key map "\M-\C-x" 'caml-eval-phrase)
+    (define-key map "\C-cb" #'caml-insert-begin-form)
+    (define-key map "\C-cf" #'caml-insert-for-form)
+    (define-key map "\C-ci" #'caml-insert-if-form)
+    (define-key map "\C-cl" #'caml-insert-let-form)
+    (define-key map "\C-cm" #'caml-insert-match-form)
+    (define-key map "\C-ct" #'caml-insert-try-form)
+    (define-key map "\C-cw" #'caml-insert-while-form)
+    (define-key map "\C-c`" #'caml-goto-phrase-error)
+    (define-key map "\C-c\C-a" #'caml-find-alternate-file)
+    (define-key map "\C-c\C-c" #'compile)
+    (define-key map "\C-c\C-e" #'caml-eval-phrase)
+    (define-key map "\C-c\C-[" #'caml-backward-to-less-indent)
+    (define-key map "\C-c\C-]" #'caml-forward-to-less-indent)
+    (define-key map "\C-c\C-q" #'caml-indent-phrase)
+    (define-key map "\C-c\C-r" #'caml-eval-region)
+    (define-key map "\C-c\C-s" #'caml-show-subshell)
+    (define-key map "\M-\C-h" #'caml-mark-phrase)
+    (define-key map "\M-\C-q" #'caml-indent-phrase)
+    (define-key map "\M-\C-x" #'caml-eval-phrase)
 
     (let ((menu (make-sparse-keymap "Caml"))
           (forms (make-sparse-keymap "Forms")))
-      (define-key map "\C-c\C-d" 'caml-show-imenu)
+      (define-key map "\C-c\C-d" #'caml-show-imenu)
       (define-key map [menu-bar] (make-sparse-keymap))
       (define-key map [menu-bar caml] (cons "Caml" menu))
       ;; caml-help
@@ -408,13 +408,11 @@ have `caml-electric-indent' on, which see.")
     st)
   "Syntax table in use in Caml mode buffers.")
 
-(defvar caml-mode-abbrev-table nil
+(define-abbrev-table 'caml-mode-abbrev-table
+  (mapcar (lambda (keyword)
+            `(,keyword ,keyword caml-abbrev-hook nil t))
+          '("and" "do" "done" "else" "end" "in" "then" "with"))
   "Abbrev table used for Caml mode buffers.")
-(if caml-mode-abbrev-table nil
-  (define-abbrev-table 'caml-mode-abbrev-table
-    (mapcar (lambda (keyword)
-              `(,keyword ,keyword caml-abbrev-hook nil t))
-            '("and" "do" "done" "else" "end" "in" "then" "with"))))
 
 ;; Other internal variables
 
@@ -435,9 +433,6 @@ have `caml-electric-indent' on, which see.")
   (require 'imenu))
 
 ;;
-(defvar caml-mode-hook nil
-  "Hook for `caml-mode'.")
-
 (define-derived-mode caml-mode prog-mode "caml"
   "Major mode for editing OCaml code."
   (setq local-abbrev-table caml-mode-abbrev-table)
@@ -617,11 +612,9 @@ See `imenu-create-index-function'."
         (prev-pos (point-max))
         index)
     (goto-char prev-pos)
-    (imenu-progress-message prev-pos 0 t)
     ;; collect definitions
     (while (caml-prev-index-position-function)
       (setq index (cons (caml-match-string 5) (point)))
-      (imenu-progress-message prev-pos nil t)
       (setq all-alist (cons index all-alist))
       (cond
        ((looking-at "[ \t]*and")
@@ -648,7 +641,7 @@ See `imenu-create-index-function'."
            (setq menu-alist
                  (cons
                   (cons (car pair)
-                        (sort (cdr pair) 'imenu--sort-by-name))
+                        (sort (cdr pair) #'imenu--sort-by-name))
                   menu-alist))))
      `(("Values" . ,value-alist)
        ("Types" . ,type-alist)
@@ -656,7 +649,6 @@ See `imenu-create-index-function'."
        ("Methods" . ,method-alist)
        ("Classes" . ,class-alist)))
     (if all-alist (setq menu-alist (cons (cons "Index" all-alist) menu-alist)))
-    (imenu-progress-message prev-pos 100 t)
     menu-alist))
 
 ;;; Indentation stuff
@@ -789,55 +781,54 @@ error message produced by ocamlc.")
 ;itz 04-21-96 instead of defining a new function, use defadvice
 ;that way we get our effect even when we do \C-x` in compilation buffer
 
-(defadvice next-error (after caml-next-error activate)
+(advice-add 'next-error :after #'caml--next-error-highlight)
+
+(defun caml--next-error-highlight (&rest _)
+  ;; FIXME: Is this advice still needed?
   "Read the extra positional information provided by the OCaml compiler.
 
 Puts the point and the mark exactly around the erroneous program
 fragment.  The erroneous fragment is also temporarily highlighted if
 possible."
-
- (if (eq major-mode 'caml-mode)
-     (let (skip bol beg end)
-       (save-excursion
-         (with-current-buffer
-             (if (boundp 'compilation-last-buffer)
-                 compilation-last-buffer   ;Emacs 19
-               "*compilation*")           ;Emacs 18
-           (save-excursion
-             (goto-char (window-point (get-buffer-window (current-buffer))))
-             (if (looking-at caml-error-chars-regexp)
-                 (setq beg
-                       (string-to-number
-                        (buffer-substring (match-beginning 1) (match-end 1)))
-                       end
-                       (string-to-number
-                        (buffer-substring (match-beginning 2) (match-end 2)))))
-             (forward-line 1)
-             (beginning-of-line)
-             (if (and (looking-at "Warning")
-                      caml-next-error-skip-warnings-flag)
-                 (setq skip 't)))))
-       (cond
-        (skip (next-error))
-        (beg
-              (setq end (- end beg))
-              (beginning-of-line)
-              (forward-char beg)
-              (setq beg (point))
-              (forward-char end)
-              (setq end (point))
-              (goto-char beg)
-              (push-mark end t)
-              (cond ((fboundp 'make-overlay)
-                     (if caml-error-overlay ()
-                       (setq caml-error-overlay (make-overlay 1 1))
-                       (overlay-put caml-error-overlay 'face 'region))
-                     (unwind-protect
-                         (progn
-                           (move-overlay caml-error-overlay
-                                         beg end (current-buffer))
-                           (sit-for 60))
-                       (delete-overlay caml-error-overlay)))))))))
+  (when (derived-mode-p 'caml-mode)
+    (let (skip beg end)
+      (save-excursion ;; FIXME: Redundant?
+        (with-current-buffer next-error-last-buffer
+          (save-excursion
+            (goto-char (window-point (get-buffer-window (current-buffer))))
+            (if (looking-at caml-error-chars-regexp)
+                (setq beg
+                      (string-to-number
+                       (buffer-substring (match-beginning 1) (match-end 1)))
+                      end
+                      (string-to-number
+                       (buffer-substring (match-beginning 2) (match-end 2)))))
+            (forward-line 1)
+            (beginning-of-line)
+            (if (and (looking-at "Warning")
+                     caml-next-error-skip-warnings-flag)
+                (setq skip 't)))))
+      (cond
+       (skip (next-error))
+       (beg
+        (setq end (- end beg))
+        (beginning-of-line)
+        (forward-char beg)
+        (setq beg (point))
+        (forward-char end)
+        (setq end (point))
+        (goto-char beg)
+        (push-mark end t)
+        (cond ((fboundp 'make-overlay)
+               (if caml-error-overlay ()
+                 (setq caml-error-overlay (make-overlay 1 1))
+                 (overlay-put caml-error-overlay 'face 'region))
+               (unwind-protect
+                   (progn
+                     (move-overlay caml-error-overlay
+                                   beg end (current-buffer))
+                     (sit-for 60))
+                 (delete-overlay caml-error-overlay)))))))))
 
 (defun caml-next-error-skip-warnings (&rest args)
   "Same as `next-error' but skip warnings.
@@ -1573,40 +1564,18 @@ matching nodes to determine KEYWORD's final indentation.")
   (insert-before-markers "\"^\"")
   (backward-char 1))
 
-(defadvice indent-new-comment-line (around
-                                    caml-indent-new-comment-line
-                                    activate)
-
+(defun caml--split-string (orig-fun &rest args)
   "Handle multi-line strings in caml mode."
+  ;; This advice doesn't make sense in other modes.  I wish there were a
+  ;; cleaner way to do this: I haven't found one.
+  (if (not (and (derived-mode-p 'caml-mode) (caml-in-literal-p)))
+      (apply orig-fun args)
+    (save-excursion
+      (caml-split-string)
+      (apply orig-fun args))))
 
-;this advice doesn't make sense in other modes. I wish there were a
-;cleaner way to do this: I haven't found one.
-
-  (let ((hooked (and (eq major-mode 'caml-mode) (caml-in-literal-p)))
-        (split-mark))
-    (if (not hooked) nil
-      (setq split-mark (set-marker (make-marker) (point)))
-      (caml-split-string))
-    ad-do-it
-    (if (not hooked) nil
-      (goto-char split-mark)
-      (set-marker split-mark nil))))
-
-(defadvice newline-and-indent (around
-                               caml-newline-and-indent
-                               activate)
-
-  "Handle multi-line strings in caml mode."
-
-    (let ((hooked (and (eq major-mode 'caml-mode) (caml-in-literal-p)))
-        (split-mark))
-    (if (not hooked) nil
-      (setq split-mark (set-marker (make-marker) (point)))
-      (caml-split-string))
-    ad-do-it
-    (if (not hooked) nil
-      (goto-char split-mark)
-      (set-marker split-mark nil))))
+(advice-add 'indent-new-comment-line :around #'caml--split-string)
+(advice-add 'newline-and-indent :around #'caml--split-string)
 
 (defun caml-electric-pipe ()
   "If inserting a | or } operator at beginning of line, reindent the line.
@@ -1851,6 +1820,10 @@ current phrase."
   "Show the type of expression or pattern at point." t)
 (autoload 'caml-types-explore "caml-types"
   "Explore type annotations by mouse dragging." t)
+(autoload 'caml-types-show-ident "caml-types"
+  "Show the binding of identifier at point." t)
+(autoload 'caml-types-show-call "caml-types"
+  "Show the kind of call at point." t)
 
 (autoload 'caml-help "caml-help"
   "Show documentation for qualified OCaml identifier." t)

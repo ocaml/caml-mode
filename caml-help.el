@@ -758,7 +758,7 @@ buffer positions."
 
 (defvar ocaml-link-map
   (let ((map (make-sparse-keymap)))
-    (define-key map [mouse-2] 'ocaml-link-goto)
+    (define-key map [mouse-2] #'ocaml-link-goto)
     map))
 
 (defun ocaml-help-show (arg)
