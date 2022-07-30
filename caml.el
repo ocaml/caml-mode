@@ -438,6 +438,7 @@ have `caml-electric-indent' on, which see.")
 (defvar caml-mode-hook nil
   "Hook for `caml-mode'.")
 
+;;;###autoload
 (define-derived-mode caml-mode prog-mode "caml"
   "Major mode for editing OCaml code."
   (setq local-abbrev-table caml-mode-abbrev-table)
@@ -475,6 +476,8 @@ have `caml-electric-indent' on, which see.")
   (if (and caml-imenu-enable (< (buffer-size) 10000))
       (caml-show-imenu)))
 
+;;;###autoload
+(add-to-list 'auto-mode-alist '("\\.ml[iylp]?$" . caml-mode))
 
 ;; Disabled because it assumes make and does not play well with ocamlbuild.
 ;; See PR#4469 for details.
