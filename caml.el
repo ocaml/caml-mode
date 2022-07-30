@@ -432,7 +432,7 @@ have `caml-electric-indent' on, which see.")
 (eval-when-compile
   (require 'imenu))
 
-;;
+;;;###autoload
 (define-derived-mode caml-mode prog-mode "caml"
   "Major mode for editing OCaml code."
   (setq local-abbrev-table caml-mode-abbrev-table)
