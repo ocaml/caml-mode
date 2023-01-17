@@ -617,11 +617,9 @@ See `imenu-create-index-function'."
         (prev-pos (point-max))
         index)
     (goto-char prev-pos)
-    (imenu-progress-message prev-pos 0 t)
     ;; collect definitions
     (while (caml-prev-index-position-function)
       (setq index (cons (caml-match-string 5) (point)))
-      (imenu-progress-message prev-pos nil t)
       (setq all-alist (cons index all-alist))
       (cond
        ((looking-at "[ \t]*and")
@@ -656,7 +654,6 @@ See `imenu-create-index-function'."
        ("Methods" . ,method-alist)
        ("Classes" . ,class-alist)))
     (if all-alist (setq menu-alist (cons (cons "Index" all-alist) menu-alist)))
-    (imenu-progress-message prev-pos 100 t)
     menu-alist))
 
 ;;; Indentation stuff
