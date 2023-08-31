@@ -315,7 +315,7 @@ have `caml-electric-indent' on, which see.")
     (define-key map [?\C-c?i] #'ocaml-add-path)
     (define-key map [?\C-c?\]] #'ocaml-close-module)
     (define-key map [?\C-c?\[] #'ocaml-open-module)
-    (define-key map [?\C-c?\C-h] #'caml-help)
+    (define-key map [?\C-h?.] #'caml-help)
     (define-key map [?\C-c?\t] #'caml-complete)
     ;; others
     (define-key map "\C-cb" #'caml-insert-begin-form)
