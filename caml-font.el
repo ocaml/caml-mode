@@ -407,7 +407,7 @@
   (caml-font-extend-after-change (point-min) (point-max) 0)
   (font-lock-mode 1)
 )
-(add-hook 'caml-mode-hook 'caml-font-set-font-lock)
+(add-hook 'caml-mode-hook #'caml-font-set-font-lock)
 
 
 
@@ -432,6 +432,6 @@
   (caml-font-extend-after-change (point-min) (point-max) 0)
   (font-lock-mode 1)
 )
-(add-hook 'inferior-caml-mode-hooks 'inferior-caml-set-font-lock)
+(add-hook 'inferior-caml-mode-hooks #'inferior-caml-set-font-lock)
 
 (provide 'caml-font)

@@ -21,10 +21,7 @@
   (make-face 'Stop)
   (set-face-foreground 'Stop "White")
   (set-face-background 'Stop "Red")
-  (make-face 'Doc)
-  (set-face-foreground 'Doc "Red")
-  (setq font-lock-stop-face 'Stop)
-  (setq font-lock-doccomment-face 'Doc)
+  (defvar font-lock-stop-face 'Stop)
 ))
 
 ; The same definition is in caml.el:
@@ -39,7 +36,7 @@
      2 font-lock-stop-face)
 ;doccomments
    '("\\(^\\|[^\"]\\)\\((\\*\\*[^*]*\\([^)*][^*]*\\*+\\)*)\\)"
-     2 font-lock-doccomment-face)
+     2 font-lock-doc-face)
 ;comments
    '("\\(^\\|[^\"]\\)\\((\\*[^*]*\\*+\\([^)*][^*]*\\*+\\)*)\\)"
      2 font-lock-comment-face)
@@ -96,7 +93,7 @@
   (setq font-lock-keywords-only t)
   (font-lock-mode 1))
 
-(add-hook 'caml-mode-hook 'caml-mode-font-hook)
+(add-hook 'caml-mode-hook #'caml-mode-font-hook)
 
 (defun inferior-caml-mode-font-hook ()
   (cond
@@ -111,6 +108,6 @@
   (setq font-lock-keywords-only t)
   (font-lock-mode 1))
 
-(add-hook 'inferior-caml-mode-hooks 'inferior-caml-mode-font-hook)
+(add-hook 'inferior-caml-mode-hooks #'inferior-caml-mode-font-hook)
 
 (provide 'caml-font)

@@ -12,13 +12,13 @@
 ;*                                                                        *
 ;**************************************************************************
 
-;;; Run camldebug under Emacs
-;;; Derived from gdb.el.
-;;; gdb.el is Copyright (C) 1988 Free Software Foundation, Inc, and is part
-;;; of GNU Emacs
-;;; Modified by Jerome Vouillon, 1994.
-;;; Modified by Ian T. Zimmerman, 1996.
-;;; Modified by Xavier Leroy, 1997.
+;; Run camldebug under Emacs
+;; Derived from gdb.el.
+;; gdb.el is Copyright (C) 1988 Free Software Foundation, Inc, and is part
+;; of GNU Emacs
+;; Modified by Jerome Vouillon, 1994.
+;; Modified by Ian T. Zimmerman, 1996.
+;; Modified by Xavier Leroy, 1997.
 
 ;; This file is free software; you can redistribute it and/or modify
 ;; it under the terms of the GNU General Public License as published by
@@ -101,8 +101,8 @@ The following commands are available:
 the last line referred to in the camldebug buffer.
 
 \\[camldebug-step], \\[camldebug-back] and \\[camldebug-next], in the camldebug
-window, call camldebug to step, backstep or next and then update the other window
-with the current file and position.
+window, call camldebug to step, backstep or next and then update the other
+window with the current file and position.
 
 If you are in a source file, you may select a point to break
 at, by doing \\[camldebug-break].
@@ -127,7 +127,7 @@ C-x SPACE sets break point at current line."
    comint-prompt-regexp camldebug-prompt-pattern
    paragraph-start comint-prompt-regexp
    camldebug-last-frame-displayed-p t)
-  (add-hook 'comint-dynamic-complete-functions #'camldebug-complete nil t)
+  (add-hook 'comint-dynamic-complete-functions #'camldebug-capf nil t)
   (make-local-variable 'shell-dirtrackp)
   (setq shell-dirtrackp t)
   (setq comint-input-sentinel #'shell-directory-tracker))
@@ -161,19 +161,15 @@ If a numeric is present, it overrides any ARGS flags and its string
 representation is simply concatenated with the COMMAND."
 
   (let* ((fun (intern (format "camldebug-%s" name))))
-    (list 'progn
-          (if doc
-              (list 'defun fun '(arg)
-                    doc
-                    '(interactive "P")
-                    (list 'camldebug-call name args
-                          '(camldebug-numeric-arg arg))))
-          (list 'define-key 'camldebug-mode-map
-                (concat "\C-c" key)
-                (list 'quote fun))
-          (list 'define-key 'caml-mode-map
-                (concat "\C-x\C-a" key)
-                (list 'quote fun)))))
+    `(progn
+       ,(when doc
+          `(defun ,fun (arg)
+             ,doc
+             (interactive "P")
+             (camldebug-call ,name ,args
+                             (camldebug-numeric-arg arg))))
+       (define-key camldebug-mode-map ,(concat "\C-c" key) #',fun)
+       (define-key caml-mode-map ,(concat "\C-x\C-a" key) #',fun))))
 
 (def-camldebug "step"   "\C-s"  "Step one event forward.")
 (def-camldebug "backstep" "\C-k" "Step one event backward.")
@@ -204,7 +200,7 @@ representation is simply concatenated with the COMMAND."
       (if (string-match "^\\$[0-9]+$" symb)
           (camldebug-call "display" symb)))))
 
-(define-key camldebug-mode-map [mouse-2] 'camldebug-mouse-display)
+(define-key camldebug-mode-map [mouse-2] #'camldebug-mouse-display)
 
 (defvar camldebug-kill-output)
 
@@ -454,48 +450,65 @@ around point."
   "")
 
 (defun camldebug-complete ()
-
   "Perform completion on the camldebug command preceding point."
-
+  (declare (obsolete completion-at-point "24.1"))
   (interactive)
+  (let* ((capf-data (camldebug-capf))
+         (command-word (buffer-substring (nth 0 capf-data) (nth 1 capf-data))))
+    (completion-in-region (nth 0 capf-data) (nth 1 capf-data)
+                          (sort (all-completions command-word (nth 2 capf-data))
+                                #'string-lessp))))
+
+(defun camldebug-capf ()
   (let* ((end (point))
-         (command (save-excursion
+         (cmd-start (save-excursion
                     (beginning-of-line)
                     (and (looking-at comint-prompt-regexp)
                          (goto-char (match-end 0)))
-                    (buffer-substring (point) end)))
-         (camldebug-complete-list nil) (command-word))
+                    (point)))
+         (command (buffer-substring cmd-start end))
+         ;; Find the word break.  This match will always succeed.
+         (_ (string-match "\\(\\`\\| \\)\\([^ ]*\\)\\'" command))
+         (command-word (match-string 2 command))
+         (word-end end)
+         (word-beg (- word-end (length command-word))))
 
-    ;; Find the word break.  This match will always succeed.
-    (string-match "\\(\\`\\| \\)\\([^ ]*\\)\\'" command)
-    (setq command-word (match-string 2 command))
+    `(,word-beg ,word-end
+                ,(completion-table-dynamic
+                  (apply-partially
+                   #'camldebug--get-completions
+                   (buffer-substring cmd-start word-beg))))))
 
-    ;itz 04-21-96 if we are trying to complete a word of nonzero
-    ;length, chop off the last character. This is a nasty hack, but it
-    ;works - in general, not just for this set of words: the comint
-    ;call below will weed out false matches - and it avoids further
-    ;mucking with camldebug's lexer.
-    (if (> (length command-word) 0)
-        (setq command (substring command 0 (1- (length command)))))
+(defun camldebug--get-completions (command-prefix command-word)
+  (let ((camldebug-complete-list nil))
+    ;;itz 04-21-96 if we are trying to complete a word of nonzero
+    ;;length, chop off the last character. This is a nasty hack, but it
+    ;;works - in general, not just for this set of words: the comint
+    ;;call below will weed out false matches - and it avoids further
+    ;;mucking with camldebug's lexer.
+    ;; FIXME: Which problem is this trying to fix/avoid/circumvent?
+    (when (> (length command-word) 0)
+      (setq command-word (substring command-word 0 (1- (length command-word)))))
 
     (let ((camldebug-filter-function #'camldebug-complete-filter))
-      (camldebug-call-1 (concat "complete " command))
+      (camldebug-call-1 (concat "complete " command-prefix command-word))
       (set-marker camldebug-delete-prompt-marker nil)
       (while (not (and camldebug-complete-list
                        (zerop (length camldebug-filter-accumulator))))
         (accept-process-output (get-buffer-process
                                 (current-buffer)))))
     (if (eq camldebug-complete-list 'fail)
-        (setq camldebug-complete-list nil))
-    (setq camldebug-complete-list
-          (sort camldebug-complete-list 'string-lessp))
-    (comint-dynamic-simple-complete command-word camldebug-complete-list)))
+        nil
+      (sort camldebug-complete-list #'string-lessp))))
 
-(define-key camldebug-mode-map "\C-l" 'camldebug-refresh)
-(define-key camldebug-mode-map "\t" 'comint-dynamic-complete)
-(define-key camldebug-mode-map "\M-?" 'comint-dynamic-list-completions)
+(define-key camldebug-mode-map "\C-l" #'camldebug-refresh)
+;; This is already the default anyway!
+;;(define-key camldebug-mode-map "\t" #'comint-dynamic-complete)
+;; FIXME: This binding is wrong since `comint-dynamic-list-completions'
+;; is a function, not a command.
+;;(define-key camldebug-mode-map "\M-?" #'comint-dynamic-list-completions)
 
-(define-key caml-mode-map "\C-x " 'camldebug-break)
+(define-key caml-mode-map "\C-x " #'camldebug-break)
 
 
 ;;;###autoload
@@ -503,27 +516,29 @@ around point."
   "*Pathname for executing camldebug.")
 
 ;;;###autoload
-(defun camldebug (path)
+(defun camldebug (file)
   "Run camldebug on program FILE in buffer *camldebug-FILE*.
 The directory containing FILE becomes the initial working directory
 and source-file directory for camldebug.  If you wish to change this, use
 the camldebug commands `cd DIR' and `directory'."
   (interactive "fRun ocamldebug on file: ")
-  (setq path (expand-file-name path))
-  (let ((file (file-name-nondirectory path)))
-    (pop-to-buffer (concat "*camldebug-" file "*"))
-    (setq default-directory (file-name-directory path))
-    (message "Current directory is %s" default-directory)
-    (make-comint (concat "camldebug-" file)
-                 (substitute-in-file-name camldebug-command-name)
-                 nil
-                 "-emacs" "-cd" default-directory file)
-    (set-process-filter (get-buffer-process (current-buffer))
-                        'camldebug-filter)
-    (set-process-sentinel (get-buffer-process (current-buffer))
-                          'camldebug-sentinel)
-    (camldebug-mode)
-    (camldebug-set-buffer)))
+  (setq file (expand-file-name file))
+  (let* ((dir (file-name-directory file))
+         (file (file-name-nondirectory file))
+         (buf
+          (let ((default-directory dir))
+            (message "Current directory is %s" default-directory)
+            (make-comint (concat "camldebug-" file)
+                         (substitute-in-file-name camldebug-command-name)
+                         nil
+                         "-emacs" "-cd" default-directory file)))
+         (proc (get-buffer-process buf)))
+    (with-current-buffer buf
+      (set-process-filter proc #'camldebug-filter)
+      (set-process-sentinel proc #'camldebug-sentinel)
+      (camldebug-mode)
+      (camldebug-set-buffer)
+      (pop-to-buffer (current-buffer)))))
 
 (defun camldebug-set-buffer ()
   (if (eq major-mode 'camldebug-mode)
