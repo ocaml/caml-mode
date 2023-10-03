@@ -839,11 +839,11 @@ buffer positions."
 ;  (boundp 'caml-mode-map)
 ;  (keymapp caml-mode-map)
 ;  (progn
-;    (define-key caml-mode-map [?\C-c?i] 'ocaml-add-path)
-;    (define-key caml-mode-map [?\C-c?]] 'ocaml-close-module)
-;    (define-key caml-mode-map [?\C-c?[] 'ocaml-open-module)
-;    (define-key caml-mode-map [?\C-c?\C-h] 'caml-help)
-;    (define-key caml-mode-map [?\C-c?\t] 'caml-complete)
+;    (define-key caml-mode-map [?\C-c?i] #'ocaml-add-path)
+;    (define-key caml-mode-map [?\C-c?]] #'ocaml-close-module)
+;    (define-key caml-mode-map [?\C-c?[] #'ocaml-open-module)
+;    (define-key caml-mode-map [?\C-h?.] #'caml-help)
+;    (define-key caml-mode-map [?\C-c?\t] #'caml-complete)
 ;    (let ((map (lookup-key caml-mode-map [menu-bar caml])))
 ;      (and
 ;       (keymapp map)
