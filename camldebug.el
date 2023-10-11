@@ -241,7 +241,7 @@ representation is simply concatenated with the COMMAND."
           (accept-process-output proc))))
     (if (not (car camldebug-kill-output))
         (error (cdr camldebug-kill-output))
-      (sit-for 0 300)
+      (sit-for 0.3)
       (camldebug-call-1 (if (y-or-n-p (cdr camldebug-kill-output)) "y" "n")))))
 ;;FIXME: camldebug doesn't output the Hide marker on kill
 

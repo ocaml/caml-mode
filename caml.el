@@ -429,8 +429,6 @@ have `caml-electric-indent' on, which see.")
           "\\([a-zA-Z][a-zA-Z0-9_']*\\)"))
 
 ;;; The major mode
-(eval-when-compile
-  (require 'imenu))
 
 ;;;###autoload
 (define-derived-mode caml-mode prog-mode "caml"
@@ -601,6 +599,8 @@ stopping at the current point."
 (defun caml-create-index-function ()
   "Create an index alist for OCaml files.
 See `imenu-create-index-function'."
+  ;; Presumably we're called from Imenu.
+  (declare-function imenu--sort-by-name "imenu" (item1 item2))
   (let (value-alist
         type-alist
         class-alist

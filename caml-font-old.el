@@ -14,15 +14,12 @@
 
 ;; useful colors
 
-(cond
- ((x-display-color-p)
-  (require 'font-lock)
-  ;; extra faces for documentation
-  (make-face 'Stop)
-  (set-face-foreground 'Stop "White")
-  (set-face-background 'Stop "Red")
-  (defvar font-lock-stop-face 'Stop)
-))
+(require 'font-lock)
+;; extra faces for documentation
+(make-face 'Stop)
+(set-face-foreground 'Stop "White")
+(set-face-background 'Stop "Red")
+(defvar font-lock-stop-face 'Stop)
 
 ; The same definition is in caml.el:
 ; we don't know in which order they will be loaded.

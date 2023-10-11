@@ -822,9 +822,8 @@ buffer positions."
                                          'mouse-face 'highlight)
                       (put-text-property (match-beginning 1) (match-end 1)
                                          'local-map ocaml-link-map)
-                      (if (x-display-color-p)
-                          (put-text-property (match-beginning 1) (match-end 1)
-                                             'face 'ocaml-link-face)))
+                      (put-text-property (match-beginning 1) (match-end 1)
+                                         'face 'ocaml-link-face))
                     )
                 ;; need to restore flag if buffer was unmodified.
                 (unless modified-p (set-buffer-modified-p nil))
