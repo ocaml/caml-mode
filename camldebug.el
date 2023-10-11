@@ -59,31 +59,29 @@
 (defvar camldebug-prompt-pattern "^(ocd) *"
   "A regexp to recognize the prompt for ocamldebug.")
 
-(defvar camldebug-overlay-event nil
+(defvar camldebug-overlay-event
+  (let ((ol (make-overlay (point-min) (point-min))))
+    (overlay-put ol 'face 'camldebug-event)
+    ol)
   "Overlay for displaying the current event.")
-(defvar camldebug-overlay-under nil
+(defvar camldebug-overlay-under
+  (let ((ol (make-overlay (point-min) (point-min))))
+    (overlay-put ol 'face 'camldebug-underline)
+    ol)
   "Overlay for displaying the current event.")
-(defvar camldebug-event-marker nil
+(defvar camldebug-event-marker (make-marker)
   "Marker for displaying the current event.")
 
 (defvar camldebug-track-frame t
   "*If non-nil, always display current frame position in another window.")
 
-(cond
- (window-system
-  (make-face 'camldebug-event)
-  (make-face 'camldebug-underline)
-  (unless (face-differs-from-default-p 'camldebug-event)
-    (invert-face 'camldebug-event))
-  (unless (face-differs-from-default-p 'camldebug-underline)
-    (set-face-underline 'camldebug-underline t))
-  (setq camldebug-overlay-event (make-overlay 1 1))
-  (overlay-put camldebug-overlay-event 'face 'camldebug-event)
-  (setq camldebug-overlay-under (make-overlay 1 1))
-  (overlay-put camldebug-overlay-under 'face 'camldebug-underline))
- (t
-  (setq camldebug-event-marker (make-marker))
-  (setq overlay-arrow-string "=>")))
+(defface camldebug-event
+  '((t :invert t))
+  "?FIXME?")
+
+(defface camldebug-underline
+  '((t :underline t))
+  "?FIXME?")
 
 ;;; Camldebug mode.
 
@@ -719,11 +717,9 @@ Obeying it means displaying in another window the specified file and line."
 ;;; Events.
 
 (defun camldebug-remove-current-event ()
-  (if window-system
-      (progn
-        (delete-overlay camldebug-overlay-event)
-        (delete-overlay camldebug-overlay-under))
-    (setq overlay-arrow-position nil)))
+  (delete-overlay camldebug-overlay-event)
+  (delete-overlay camldebug-overlay-under)
+  (setq-local overlay-arrow-position nil))
 
 (defun camldebug-set-current-event (spos epos buffer before)
   (if window-system
@@ -738,7 +734,7 @@ Obeying it means displaying in another window the specified file and line."
       (goto-char spos)
       (beginning-of-line)
       (move-marker camldebug-event-marker (point))
-      (setq overlay-arrow-position camldebug-event-marker))))
+      (setq-local overlay-arrow-position camldebug-event-marker))))
 
 ;;; Miscellaneous.
 

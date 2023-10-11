@@ -1,17 +1,17 @@
 ;;; caml-help.el --- Contextual completion and help to caml-mode  -*- lexical-binding: t; -*-
-;**************************************************************************
-;*                                                                        *
-;*                                 OCaml                                  *
-;*                                                                        *
-;*             Didier Remy, projet Cristal, INRIA Rocquencourt            *
-;*                                                                        *
-;*   Copyright 2001 Institut National de Recherche en Informatique et     *
-;*     en Automatique.                                                    *
-;*                                                                        *
-;*   All rights reserved.  This file is distributed under the terms of    *
-;*   the GNU General Public License.                                      *
-;*                                                                        *
-;**************************************************************************
+;;**************************************************************************
+;;*                                                                        *
+;;*                                 OCaml                                  *
+;;*                                                                        *
+;;*             Didier Remy, projet Cristal, INRIA Rocquencourt            *
+;;*                                                                        *
+;;*   Copyright 2001 Institut National de Recherche en Informatique et     *
+;;*     en Automatique.                                                    *
+;;*                                                                        *
+;;*   All rights reserved.  This file is distributed under the terms of    *
+;;*   the GNU General Public License.                                      *
+;;*                                                                        *
+;;**************************************************************************
 
 ;; Author: Didier Remy, November 2001.
 
@@ -811,51 +811,41 @@ buffer positions."
               (case-fold-search nil))
           (save-excursion
             (goto-char (point-min))
-            (let ((buffer-read-only nil)
-                  ;; use of dynamic scoping, need not be restored!
-                  (modified-p (buffer-modified-p)))
-              (unwind-protect
-                  (save-excursion
-                    (goto-char (point-min))
-                    (while (re-search-forward regexp (point-max) t)
-                      (put-text-property (match-beginning 1) (match-end 1)
-                                         'mouse-face 'highlight)
-                      (put-text-property (match-beginning 1) (match-end 1)
-                                         'local-map ocaml-link-map)
-                      (put-text-property (match-beginning 1) (match-end 1)
-                                         'face 'ocaml-link-face))
-                    )
-                ;; need to restore flag if buffer was unmodified.
-                (unless modified-p (set-buffer-modified-p nil))
-                ))
-            )))))
+            (with-silent-modifications
+              (while (re-search-forward regexp (point-max) t)
+                (put-text-property (match-beginning 1) (match-end 1)
+                                   'mouse-face 'highlight)
+                (put-text-property (match-beginning 1) (match-end 1)
+                                   'local-map ocaml-link-map)
+                (put-text-property (match-beginning 1) (match-end 1)
+                                   'face 'ocaml-link-face))))))))
 
 
 
 ;; bindings ---now in caml.el
 
-; (and
-;  (boundp 'caml-mode-map)
-;  (keymapp caml-mode-map)
-;  (progn
-;    (define-key caml-mode-map [?\C-c?i] #'ocaml-add-path)
-;    (define-key caml-mode-map [?\C-c?]] #'ocaml-close-module)
-;    (define-key caml-mode-map [?\C-c?[] #'ocaml-open-module)
-;    (define-key caml-mode-map [?\C-h?.] #'caml-help)
-;    (define-key caml-mode-map [?\C-c?\t] #'caml-complete)
-;    (let ((map (lookup-key caml-mode-map [menu-bar caml])))
-;      (and
-;       (keymapp map)
-;       (progn
-;         (define-key map [separator-help] '("---"))
-;         (define-key map [open] '("Open add path" . ocaml-add-path ))
-;         (define-key map [close]
-;           '("Close module for help" . ocaml-close-module))
-;         (define-key map [open] '("Open module for help" . ocaml-open-module))
-;         (define-key map [help] '("Help for identifier" . caml-help))
-;         (define-key map [complete] '("Complete identifier" . caml-complete))
-;         )
-;    ))))
+;; (and
+;;  (boundp 'caml-mode-map)
+;;  (keymapp caml-mode-map)
+;;  (progn
+;;    (define-key caml-mode-map [?\C-c?i] #'ocaml-add-path)
+;;    (define-key caml-mode-map [?\C-c?]] #'ocaml-close-module)
+;;    (define-key caml-mode-map [?\C-c?[] #'ocaml-open-module)
+;;    (define-key caml-mode-map [?\C-h?.] #'caml-help)
+;;    (define-key caml-mode-map [?\C-c?\t] #'caml-complete)
+;;    (let ((map (lookup-key caml-mode-map [menu-bar caml])))
+;;      (and
+;;       (keymapp map)
+;;       (progn
+;;         (define-key map [separator-help] '("---"))
+;;         (define-key map [open] '("Open add path" . ocaml-add-path ))
+;;         (define-key map [close]
+;;           '("Close module for help" . ocaml-close-module))
+;;         (define-key map [open] '("Open module for help" . ocaml-open-module))
+;;         (define-key map [help] '("Help for identifier" . caml-help))
+;;         (define-key map [complete] '("Complete identifier" . caml-complete))
+;;         )
+;;    ))))
 
 
 (provide 'caml-help)
