@@ -468,6 +468,8 @@ have `caml-electric-indent' on, which see.")
   (if (and caml-imenu-enable (< (buffer-size) 10000))
       (caml-show-imenu)))
 
+;;;###autoload
+(add-to-list 'auto-mode-alist '("\\.ml[iylp]?$" . caml-mode))
 
 ;; Disabled because it assumes make and does not play well with ocamlbuild.
 ;; See PR#4469 for details.
