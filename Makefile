@@ -73,24 +73,24 @@ install-el:
 
 install:
 	@echo "Installing in $(INSTALL_DIR)..."
-	$(INSTALL_MKDIR) $(INSTALL_DIR)
-	$(INSTALL_DATA) $(FILES) $(INSTALL_DIR)
+	$(INSTALL_MKDIR) "$(INSTALL_DIR)"
+	$(INSTALL_DATA) $(FILES) "$(INSTALL_DIR)"
 	if [ -z "$(NOCOMPILE)" ]; then \
-	  cd $(INSTALL_DIR); $(EMACS) --batch --eval '$(COMPILECMD)'; \
+	  cd "$(INSTALL_DIR)"; $(EMACS) --batch --eval '$(COMPILECMD)'; \
 	fi
 
 uninstall:
-	cd $(INSTALL_DIR) && $(INSTALL_RM_R) $(FILES) $(FILES:.el=.elc)
+	cd "$(INSTALL_DIR)" && $(INSTALL_RM_R) $(FILES) $(FILES:.el=.elc)
 
 ocamltags:	ocamltags.in
 	sed -e 's:@EMACS@:$(EMACS):' ocamltags.in >ocamltags
 	chmod a+x ocamltags
 
 install-ocamltags: ocamltags
-	$(INSTALL_DATA) ocamltags $(INSTALL_BIN)/ocamltags
+	$(INSTALL_DATA) ocamltags "$(INSTALL_BIN)"/ocamltags
 
 uninstall-ocamltags:
-	$(INSTALL_RM_R) $(INSTALL_BIN)/ocamltags
+	$(INSTALL_RM_R) "$(INSTALL_BIN)"/ocamltags
 
 tarball: $(TARBALL)
 $(TARBALL): $(DIST_FILES)
